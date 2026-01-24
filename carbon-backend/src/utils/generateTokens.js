@@ -74,7 +74,6 @@ const sendTokens = async (user, res) => {
 
 
 
-
 // const sendTokens = async (user, res) => {
 //   const accessToken = generateAccessToken(user);
 //   const refreshToken = generateRefreshToken(user);
