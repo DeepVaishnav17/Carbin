@@ -49,6 +49,9 @@ app.use("/api/events", eventRoutes);
 const walletRoutes = require("./src/routes/walletRoutes");
 app.use("/api/wallet", walletRoutes);
 
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+
+
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
