@@ -37,12 +37,11 @@ app.set("trust proxy", 1);
 // );
 app.use(
   cors({
-    origin: function (origin, callback) {
-      callback(null, origin);   // 🔥 mirror origin
-    },
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
+
 
 
 

@@ -44,18 +44,17 @@ router.get(
 //     }
 //   }
 // );
-router.get("/google/callback",
+router.get(
+  "/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
-    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success?id=${req.user._id}`);
+    await sendTokens(req.user, res);  // ⭐ cookies set HERE
+
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
   }
 );
 
-router.get("/set-cookie", async (req, res) => {
-  const user = await User.findById(req.query.id);
-  await sendTokens(user, res);
-  res.json({ ok: true });
-});
+
 
 
 
