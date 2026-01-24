@@ -29,21 +29,32 @@ router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", { session: false }),
+//   async (req, res) => {
+//     await sendTokens(req.user, res);
+
+//     if (req.user.role === "admin") {
+//       return res.redirect(`${process.env.FRONTEND_URL}/admin`);
+//     } else if (!req.user.city) {
+//       return res.redirect(`${process.env.FRONTEND_URL}/location`);
+//     } else {
+//       return res.redirect(`${process.env.FRONTEND_URL}`);
+//     }
+//   }
+// );
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
     await sendTokens(req.user, res);
 
-    if (req.user.role === "admin") {
-      return res.redirect(`${process.env.FRONTEND_URL}/admin`);
-    } else if (!req.user.city) {
-      return res.redirect(`${process.env.FRONTEND_URL}/location`);
-    } else {
-      return res.redirect(`${process.env.FRONTEND_URL}`);
-    }
+    // 🔥 ALWAYS go here after OAuth
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
   }
 );
+
 
 
 

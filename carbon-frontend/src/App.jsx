@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import Admin from "./pages/Admin";
 import AdminRoute from "./components/AdminRoute";
+import OAuthSuccess from "./pages/OAuthSuccess";
 
 import HomeRedirect from "./components/HomeRedirect";
 import PublicHome from "./pages/Home"; // reuse Home as public
@@ -54,6 +55,7 @@ function App() {
 />
 <Route path="/scan" element={<ScanQR />} />
 
+<Route path="/oauth-success" element={<OAuthSuccess />} />
       </Routes>
       
     </BrowserRouter>
