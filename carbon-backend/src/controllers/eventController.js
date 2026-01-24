@@ -168,7 +168,7 @@ exports.joinEvent = async (req, res) => {
     const user = await User.findById(userId);
 
     // ✅ QR URL hosted by your backend
-    const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
+    const qrImageUrl = `http://localhost:5000/api/events/qr/${eventId}/${userId}`;
 
 await sendEmail(
   user.email,

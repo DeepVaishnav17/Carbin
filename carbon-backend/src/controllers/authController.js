@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-   const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify/${verifyToken}`;
+  const verifyLink = `http://localhost:5000/api/auth/verify/${verifyToken}`;
 
     await sendEmail(
       email,
