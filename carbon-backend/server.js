@@ -20,6 +20,7 @@ app.use(
    origin: [
   //"http://localhost:5173",
   process.env.FRONTEND_URL, // Vercel in prod
+   process.env.BACKEND_URL,
 ]
 ,
 
