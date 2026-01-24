@@ -15,23 +15,31 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+// app.use(
+//   cors({
+//    origin: [
+//   //"http://localhost:5173",
+//   //process.env.FRONTEND_URL, // Vercel in prod
+//    //process.env.BACKEND_URL,
+//      "https://carbin-zeta.vercel.app",
+// ]
+// ,
+
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-   origin: [
-  //"http://localhost:5173",
-  process.env.FRONTEND_URL, // Vercel in prod
-   process.env.BACKEND_URL,
-]
-,
-
+    origin: "https://carbin-zeta.vercel.app",
     credentials: true,
   })
 );
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   next();
+// });
 
 
 app.use(express.json());
