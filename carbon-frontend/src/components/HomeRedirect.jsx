@@ -3,11 +3,14 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 export default function HomeRedirect() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) return <h2>Loading...</h2>;
 
   if (!user) return <Navigate to="/public" />;
 
   if (user.role === "admin") return <Navigate to="/admin" />;
+  if (!user.city) return <Navigate to="/location" />;
 
-  return <Navigate to="/home" />;
+  return <Navigate to="/dashboard" />;
 }
