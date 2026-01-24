@@ -25,6 +25,31 @@ const generateRefreshToken = (user) => {
   );
 };
 
+// const sendTokens = async (user, res) => {
+//   const accessToken = generateAccessToken(user);
+//   const refreshToken = generateRefreshToken(user);
+
+//   user.refreshToken = refreshToken;
+//   await user.save();
+
+  
+//   const cookieOptions = {
+//     httpOnly: true,
+//     secure: isProd,
+//   sameSite: isProd ? "none" : "lax",
+//   path: "/",
+//   };
+
+//   res.cookie("accessToken", accessToken, {
+//     ...cookieOptions,
+//     maxAge: 15 * 60 * 1000,
+//   });
+
+//   res.cookie("refreshToken", refreshToken, {
+//     ...cookieOptions,
+//     maxAge: 7 * 24 * 60 * 60 * 1000,
+//   });
+// };
 const sendTokens = async (user, res) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
@@ -32,24 +57,21 @@ const sendTokens = async (user, res) => {
   user.refreshToken = refreshToken;
   await user.save();
 
-  
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isProd,
-  sameSite: isProd ? "none" : "lax",
-  path: "/",
-  };
-
   res.cookie("accessToken", accessToken, {
-    ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 
   res.cookie("refreshToken", refreshToken, {
-    ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 };
+
 
 // const sendTokens = async (user, res) => {
 //   const accessToken = generateAccessToken(user);
