@@ -7,12 +7,12 @@ export default function OAuthSuccess() {
   const { fetchUser } = useContext(AuthContext);
 
   useEffect(() => {
-    const run = async () => {
-      await fetchUser();       // 🔥 this is what was missing
-      navigate("/");           // go to HomeRedirect
-    };
+    const timer = setTimeout(async () => {
+      await fetchUser();   // now cookies are ready
+      navigate("/");       // HomeRedirect
+    }, 900);               // <-- the magic
 
-    run();
+    return () => clearTimeout(timer);
   }, []);
 
   return <h2>Logging you in...</h2>;
