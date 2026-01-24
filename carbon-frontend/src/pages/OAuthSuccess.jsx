@@ -7,11 +7,11 @@ export default function OAuthSuccess() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const load = async () => {
-      await fetchUser();  // cookies → get user
-      navigate("/");
+    const init = async () => {
+      await fetchUser();   // THIS will call /auth/me
+      navigate("/");       // now HomeRedirect will work
     };
-    load();
+    init();
   }, []);
 
   return <h2>Logging you in...</h2>;
