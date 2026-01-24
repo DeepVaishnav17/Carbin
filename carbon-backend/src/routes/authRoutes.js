@@ -10,7 +10,7 @@ const { logout } = require("../controllers/authController");
 
 const passport = require("passport");
 const { sendTokens } = require("../utils/generateTokens");
-
+const User = require("../models/User")
 
 
 
@@ -44,16 +44,18 @@ router.get(
 //     }
 //   }
 // );
-router.get(
-  "/google/callback",
+router.get("/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
-    await sendTokens(req.user, res);
-
-    // 🔥 ALWAYS go here after OAuth
-    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success?id=${req.user._id}`);
   }
 );
+
+router.get("/set-cookie", async (req, res) => {
+  const user = await User.findById(req.query.id);
+  await sendTokens(user, res);
+  res.json({ ok: true });
+});
 
 
 
