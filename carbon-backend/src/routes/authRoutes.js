@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { register, verifyEmail, login, refreshToken  } = require("../controllers/authController");
+const { register, verifyEmail, login, refreshToken } = require("../controllers/authController");
 
 const { protect } = require("../middleware/authMiddleware");
 const { setLocation } = require("../controllers/authController");
@@ -48,15 +48,16 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
-    await sendTokens(req.user, res);  // ⭐ cookies set HERE
+    await sendTokens(req.user, res); // sets httpOnly cookie
 
-    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
+   // return res.redirect("http://localhost:5173/oauth-success");
+   return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
+
   }
 );
 
-
-
-
+const { generateQRImage } = require("../controllers/eventController");
+router.get("/qr/:eventId/:userId", generateQRImage);
 
 
 

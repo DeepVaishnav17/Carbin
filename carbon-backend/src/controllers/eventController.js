@@ -165,58 +165,32 @@ exports.joinEvent = async (req, res) => {
     event.participants.push(userId);
     await event.save();
 
-    // ✅ QR IMAGE URL (served from your backend route)
-   // const qrImageUrl = `${process.env.BASE_URL}/api/events/qr/${eventId}/${userId}`;
+    const user = await User.findById(userId);
 
-    // ✅ EMAIL SEND
-    //const user = await User.findById(userId);
-
-    // await sendEmail(
-    //   user.email,
-    //   `QR Code for ${event.title}`,
-    //   `
-    //     <h2>You successfully joined "${event.title}"</h2>
-    //     <p>Show this QR code to the organizer at the event:</p>
-    //     <img src="${qrImageUrl}" />
-    //     <p>Location: ${event.location}</p>
-    //     <p>Date: ${new Date(event.date).toDateString()}</p>
-    //   `
-    // );
- // const qrUrl = `${BASE_URL}/api/events/attendance/${eventId}?userId=${userId}`;
-const qrUrl = `${process.env.FRONTEND_URL}/scan?eventId=${eventId}&userId=${userId}`;
-
-
- const qrImage = await QRCode.toDataURL(qrUrl);
-const user = await User.findById(userId);
+    // ✅ QR URL hosted by your backend
+    const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
 
 await sendEmail(
   user.email,
   `QR Code for ${event.title}`,
   `
     <h2>You successfully joined "${event.title}"</h2>
-    <p>Show this QR code to the organizer at the event:</p>
-    <img src="cid:qrcode" style="width:250px;height:250px;" />
+    <p>Show this QR code to the organizer:</p>
+    <img src="${qrImageUrl}" style="width:250px;height:250px;" />
     <p><b>Location:</b> ${event.location}</p>
     <p><b>Date:</b> ${new Date(event.date).toDateString()}</p>
-  `,
-  [
-    {
-      filename: "qrcode.png",
-      content: qrImage.split("base64,")[1],
-      encoding: "base64",
-      cid: "qrcode",
-    },
-  ]
+  `
 );
 
 
     res.json({ message: "Joined event. QR sent to your email!" });
 
-  }
-   catch (err) {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 
@@ -415,6 +389,20 @@ exports.getAllEventsForAdmin = async (req, res) => {
       .populate("attendedUsers", "name email");
 
     res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+exports.generateQRImage = async (req, res) => {
+  try {
+    const { eventId, userId } = req.params;
+
+    const qrUrl = `${process.env.FRONTEND_URL}/scan?eventId=${eventId}&userId=${userId}`;
+
+    const qrImage = await QRCode.toBuffer(qrUrl);
+
+    res.setHeader("Content-Type", "image/png");
+    res.send(qrImage);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

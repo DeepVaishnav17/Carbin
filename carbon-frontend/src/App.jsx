@@ -22,8 +22,8 @@ function App() {
      <Navbar />
       <Routes>
       <Route path="/" element={<HomeRedirect />} />
-<Route path="/home" element={<Home />} />
-<Route path="/public" element={<Home />} />
+{/* <Route path="/home" element={<Home />} />
+<Route path="/public" element={<Home />} /> */}
 
 
         <Route path="/login" element={<Login />} />

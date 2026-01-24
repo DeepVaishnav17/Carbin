@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Navigate } from "react-router-dom";
 import api from "../api/axios";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Register() {
+  const { user, loading } = useContext(AuthContext);
+
+  // 🔥 Prevent logged-in users from seeing register page
+  if (loading) return null;
+  if (user) return <Navigate to="/" />;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -27,18 +35,10 @@ export default function Register() {
       <h2>Register</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-        />
+        <input name="name" placeholder="Name" onChange={handleChange} />
         <br /><br />
 
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
+        <input name="email" placeholder="Email" onChange={handleChange} />
         <br /><br />
 
         <input

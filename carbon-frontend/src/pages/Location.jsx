@@ -20,7 +20,9 @@ export default function Location() {
     try {
       const res = await api.post("/auth/set-location", form);
       alert(res.data.message);
-      navigate("/");
+      await api.get("/auth/me");  // fetch updated user
+window.location.href = "/dashboard";
+
     } catch (err) {
       alert("Error saving location");
     }
