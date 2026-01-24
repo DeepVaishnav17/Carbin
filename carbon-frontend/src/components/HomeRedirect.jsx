@@ -7,7 +7,8 @@ export default function HomeRedirect() {
 
   if (loading) return <h2>Loading...</h2>;
 
-  if (!user) return <Navigate to="/public" />;
+  if (!user) return <Navigate to="/login" />;
+
 
   if (user.role === "admin") return <Navigate to="/admin" />;
   if (!user.city) return <Navigate to="/location" />;
