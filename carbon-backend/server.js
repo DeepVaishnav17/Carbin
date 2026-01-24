@@ -28,13 +28,22 @@ app.set("trust proxy", 1);
 //     credentials: true,
 //   })
 // );
+// app.use(
+//   cors({
+//    // origin: "https://carbin-zeta.vercel.app",
+//    orgin: true,
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-   // origin: "https://carbin-zeta.vercel.app",
-   orgin: true,
+    origin: function (origin, callback) {
+      callback(null, origin);   // 🔥 mirror origin
+    },
     credentials: true,
   })
 );
+
 
 
 // app.use((req, res, next) => {
