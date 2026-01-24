@@ -57,6 +57,10 @@ const sendTokens = async (user, res) => {
   user.refreshToken = refreshToken;
   await user.save();
 
+  // 🔥 CRITICAL HEADERS (missing piece)
+  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
+  res.header("Access-Control-Allow-Credentials", "true");
+
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: true,
@@ -71,6 +75,7 @@ const sendTokens = async (user, res) => {
     path: "/",
   });
 };
+
 
 
 // const sendTokens = async (user, res) => {
