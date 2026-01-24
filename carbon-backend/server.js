@@ -30,7 +30,8 @@ app.set("trust proxy", 1);
 // );
 app.use(
   cors({
-    origin: "https://carbin-zeta.vercel.app",
+   // origin: "https://carbin-zeta.vercel.app",
+   orgin: true,
     credentials: true,
   })
 );
@@ -43,7 +44,7 @@ app.use(
 
 
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser());  
 
 
 const passport = require("./src/config/passport");
