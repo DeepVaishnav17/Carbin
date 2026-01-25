@@ -71,6 +71,12 @@ export default function Navbar() {
             >
               Events
             </NavLink>
+            <NavLink
+              to="/predict"
+              className={({ isActive }) => `navbar-link ${isActive ? 'active' : ''}`}
+            >
+              Predict
+            </NavLink>
             {user && (
               <>
                 <NavLink
@@ -125,6 +131,13 @@ export default function Navbar() {
           onClick={closeMobileMenu}
         >
           Events
+        </NavLink>
+        <NavLink
+          to="/predict"
+          className={({ isActive }) => `navbar-mobile-link ${isActive ? 'active' : ''}`}
+          onClick={closeMobileMenu}
+        >
+          Predict
         </NavLink>
         {user && (
           <>
