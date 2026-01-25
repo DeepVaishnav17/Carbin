@@ -38,6 +38,20 @@ export default function Events() {
     fetchPastEvents();
   }, []);
 
+  /* ================= CURSOR TRACKING ================= */
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+
+      document.documentElement.style.setProperty("--mouse-x", `${x}%`);
+      document.documentElement.style.setProperty("--mouse-y", `${y}%`);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
   /* ================= HELPERS ================= */
 
   const getEventStatus = (date) => {
@@ -86,27 +100,35 @@ export default function Events() {
     res.data.attendedUsers.forEach((id) => {
       map[id] = true;
     });
+
     setAttendedMap(map);
   };
 
   const handleMarkAttendance = async (eventId, userId) => {
     await api.post(`/events/attendance/${eventId}`, { userId });
-    setAttendedMap((prev) => ({ ...prev, [userId]: true }));
+
+    setAttendedMap((prev) => ({
+      ...prev,
+      [userId]: true,
+    }));
   };
 
   const handleGetQR = async (eventId) => {
     const res = await api.get(`/events/qr/${eventId}`);
-    setQrMap((prev) => ({ ...prev, [eventId]: res.data.qrImage }));
+
+    setQrMap((prev) => ({
+      ...prev,
+      [eventId]: res.data.qrImage,
+    }));
   };
 
   /* ================= DATA SPLIT ================= */
 
   const allEvents = [...events, ...pastEvents];
-
   const myEvents = allEvents.filter(isOrganizer);
   const otherEvents = allEvents.filter((ev) => !isOrganizer(ev));
 
-  /* ================= UI ================= */
+  /* ================= CARD ================= */
 
   const renderEventCard = (event) => {
     const status = getEventStatus(event.date);
@@ -187,46 +209,97 @@ export default function Events() {
     );
   };
 
+  /* ================= UI ================= */
+
   return (
     <div className="events-page">
-      <header className="events-header">
-        <h1 className="events-title">Events</h1>
-        <p className="events-subtitle">
-          Air quality initiatives, alerts, and awareness programs
-        </p>
+      {/* ===== HERO / HEADER SECTION ===== */}
+      <section className="events-hero">
+        <div className="events-hero-content">
+          <h1 className="events-title">Events</h1>
+          <p className="events-subtitle">
+            Air quality initiatives, alerts, and awareness programs
+          </p>
 
-        {user && (
-          <button className="btn-manage" onClick={() => setShowCreateForm(!showCreateForm)}>
-            {showCreateForm ? "Close Create Event" : "Create New Event"}
-          </button>
-        )}
-      </header>
+          {user && (
+            <button
+              className="btn-manage"
+              onClick={() => setShowCreateForm((prev) => !prev)}
+            >
+              {showCreateForm ? "Close Create Event" : "Create New Event"}
+            </button>
+          )}
+        </div>
+      </section>
 
+      {/* ===== CREATE EVENT FORM ===== */}
       {user && showCreateForm && (
-        <form onSubmit={handleCreate} className="event-card" style={{ maxWidth: 500 }}>
-          <input name="title" placeholder="Title" required onChange={handleChange} />
-          <input name="description" placeholder="Description" required onChange={handleChange} />
-          <input type="date" name="date" required onChange={handleChange} />
-          <input name="location" placeholder="Location" required onChange={handleChange} />
-          <button className="btn-join">Create Event</button>
-        </form>
+        <section className="create-event-section">
+          <form className="create-event-form" onSubmit={handleCreate}>
+            <div className="form-row">
+              <input
+                name="title"
+                placeholder="Title"
+                required
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-row">
+              <input
+                name="description"
+                placeholder="Description"
+                required
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-row">
+              <input
+                type="date"
+                name="date"
+                required
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-row">
+              <input
+                name="location"
+                placeholder="Location"
+                required
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-actions">
+              <button className="btn-join">Create Event</button>
+            </div>
+          </form>
+        </section>
       )}
 
+
+      {/* ===== MY EVENTS ===== */}
       {user && myEvents.length > 0 && (
-        <>
-          <h2 style={{ margin: "32px 0 16px" }}>My Events</h2>
+        <section className="events-section">
+          <h2 className="section-title">My Events</h2>
           <div className="events-grid">{myEvents.map(renderEventCard)}</div>
-        </>
+        </section>
       )}
 
-      <h2 style={{ margin: "40px 0 16px" }}>All Events</h2>
-      <div className="events-grid">
-        {otherEvents.length === 0 ? (
-          <div className="empty-state">No events available</div>
-        ) : (
-          otherEvents.map(renderEventCard)
-        )}
-      </div>
+      {/* ===== ALL EVENTS ===== */}
+      <section className="events-section">
+        <h2 className="section-title">All Events</h2>
+        <div className="events-grid">
+          {otherEvents.length === 0 ? (
+            <div className="empty-state">No events available</div>
+          ) : (
+            otherEvents.map(renderEventCard)
+          )}
+        </div>
+      </section>
     </div>
   );
+
 }
