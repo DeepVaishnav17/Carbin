@@ -1,0 +1,114 @@
+.aqi-cards-container {
+    margin-bottom: 30px;
+}
+
+.cards-title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    /* Space for scrollbar if needed */
+}
+
+.aqi-card {
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass Background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    /* Ensure cards don't shrink too much */
+}
+
+.aqi-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.aqi-card.selected {
+    background: rgba(44, 255, 5, 0.1);
+    /* Highlight Selection */
+    border-color: #2CFF05;
+    box-shadow: 0 0 15px rgba(44, 255, 5, 0.2);
+}
+
+.card-day {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.day-name {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.day-date {
+    color: #999999;
+    font-size: 12px;
+}
+
+.card-aqi {
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.aqi-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.aqi-label {
+    font-size: 10px;
+    color: #999999;
+    text-transform: uppercase;
+}
+
+.card-category {
+    margin-top: auto;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    border-left: 3px solid transparent;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .cards-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .cards-grid {
+        display: flex;
+        /* Scroll horizontal on mobile */
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+    }
+
+    .aqi-card {
+        min-width: 140px;
+        scroll-snap-align: start;
+    }
+}

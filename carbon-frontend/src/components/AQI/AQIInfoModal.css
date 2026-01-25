@@ -1,0 +1,190 @@
+.aqi-info-container {
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass Base */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 40px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+}
+
+.info-toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.info-toggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.toggle-icon {
+    font-size: 24px;
+    color: #2cff05;
+    /* Accent Green */
+    margin-right: 16px;
+    font-weight: 300;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(44, 255, 5, 0.3);
+    border-radius: 50%;
+}
+
+.toggle-text {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.info-content {
+    padding: 0 24px 24px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.info-section {
+    margin-bottom: 30px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    color: #2cff05;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.section-text {
+    color: #cccccc;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* Categories Grid */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.category-info {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.category-badge {
+    color: #fff;
+    /* Usually white text on badge */
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    display: inline-block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.category-info span:last-child {
+    color: #eee;
+    font-size: 12px;
+}
+
+/* Pollutants Grid */
+.pollutants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.pollutant-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.pollutant-name {
+    color: #ffffff;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.pollutant-desc {
+    color: #999999;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.learn-more-button {
+    background: transparent;
+    border: 1px solid #2cff05;
+    color: #2cff05;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-top: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.learn-more-button:hover {
+    background: rgba(44, 255, 5, 0.1);
+    box-shadow: 0 0 15px rgba(44, 255, 5, 0.2);
+}
+
+.disclaimer {
+    background: rgba(255, 0, 0, 0.05);
+    border: 1px solid rgba(255, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.disclaimer-text {
+    color: #999999;
+    font-size: 12px;
+    line-height: 1.5;
+    font-style: italic;
+    margin: 0;
+}
+
+.disclaimer-word {
+    color: #ff4d4d;
+    font-weight: 700;
+    text-transform: uppercase;
+}
