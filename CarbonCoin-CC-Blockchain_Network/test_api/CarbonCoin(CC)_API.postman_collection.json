@@ -1,0 +1,274 @@
+{
+  "info": {
+    "_postman_id": "da083b74-ac63-4ddc-92bd-003121397c30",
+    "name": "CarbonCoin(CC)_API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43641977",
+    "_collection_link": "https://go.postman.co/collection/43641977-da083b74-ac63-4ddc-92bd-003121397c30?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "API",
+      "item": [
+        {
+          "name": "create_wallet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\": \"john@example.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/create_wallet",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "create_wallet"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/balance?wallet=53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "balance"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/transactions?wallet=53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "wallet_info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/wallet/info?wallet=1045b5634bcf1bec3372bdc1e69c786c190c60c2199df848471a1e138f0fd748",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "wallet",
+                "info"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "1045b5634bcf1bec3372bdc1e69c786c190c60c2199df848471a1e138f0fd748"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "collection",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/balance",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "balances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/balances",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "balances"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "assign_reward",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_address\": \"53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e\",\r\n    \"amount\": 10.0  // optional - defaults to 5 if not provided\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7000/assign_reward",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "assign_reward"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/transactions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "peers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/peers",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "peers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,556 @@
+{
+  "info": {
+    "_postman_id": "fdcd0f5c-b847-4982-b265-e2e42e8b8736",
+    "name": "Carbon_Coin_Blockchain_Network",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43641977",
+    "_collection_link": "https://go.postman.co/collection/43641977-fdcd0f5c-b847-4982-b265-e2e42e8b8736?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "user0",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "transfer",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"receiver\": \"7952214247e8adc354f2bdb9444c85d69bd1be21ee68198019b132c994ef444c\",\r\n    \"amount\": 13\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/transfer",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "transfer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API",
+      "item": [
+        {
+          "name": "create_wallet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\": \"john.doe@example.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/create_wallet",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "create_wallet"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/balance?wallet=53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "balance"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/transactions?wallet=53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "53a3fd1bd5f705d9267d99cea26060cd15490b7a559808ba2baab62eb4d3934e"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "wallet_info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/wallet/info?wallet=7952214247e8adc354f2bdb9444c85d69bd1be21ee68198019b132c994ef444c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "wallet",
+                "info"
+              ],
+              "query": [
+                {
+                  "key": "wallet",
+                  "value": "7952214247e8adc354f2bdb9444c85d69bd1be21ee68198019b132c994ef444c"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "collection",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "balances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/balances",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "balances"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "assign_reward",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_address\": \"9cdef692f70b845df2a4b0169d92c2f009b3ae98145cecc61b3e26fc099cded8\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7000/assign_reward",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "assign_reward"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "peers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/peers",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "peers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7000/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7000",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "miner0",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "startMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/miner/start",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "miner",
+                "start"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stopMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/miner/stop",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "miner",
+                "stop"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "miner1",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "startMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/miner/start",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "miner",
+                "start"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stopMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/miner/stop",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "miner",
+                "stop"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "miner2",
+      "item": [
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3002/address",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "startMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3002/miner/start",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "miner",
+                "start"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stopMining",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3002/miner/stop",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "miner",
+                "stop"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "chain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3002/chain",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "chain"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -33,15 +33,15 @@ CarbonCoin (CC) is a blockchain-based reward system designed for environmental i
 │        │   Auto-transfer (≥100 CC)     │                        │
 │        └───────────────┼───────────────┘                        │
 │                        ▼                                        │
-│               ┌────────────────┐                                │
-│               │  Collection    │                                │
-│               │  Node :7000    │                                │
-│               └───────┬────────┘                                │
-│                       │                                         │
-│                       │  Claim rewards (5 CC)                   │
-│                       ▼                                         │
-│   ┌──────────┐    ┌──────────┐    ┌──────────┐                 │
-│   │ User 1   │    │ User 2   │    │ User 3   │    ...          │
+│               ┌────────────────┐       ┌────────────────┐       │
+│               │  Collection    │       │  Gateway API   │       │
+│               │  Node :7000    │       │  :8000         │       │
+│               └───────┬────────┘       └───────┬────────┘       │
+│                       │                        │                │
+│                       │  Assign rewards        │ Create wallets │
+│                       ▼                        │ Query balance  │
+│   ┌──────────┐    ┌──────────┐    ┌──────────┐ │                │
+│   │ User 1   │    │ User 2   │    │ User 3   │◄┘  ...          │
 │   │ :5000    │    │ :5001    │    │ :5002    │                 │
 │   └──────────┘    └──────────┘    └──────────┘                 │
 │                                                                 │
@@ -50,11 +50,12 @@ CarbonCoin (CC) is a blockchain-based reward system designed for environmental i
 
 ### Node Types
 
-| Type           | Ports     | Purpose                                           |
-| -------------- | --------- | ------------------------------------------------- |
-| **Miner**      | 3000-3002 | Mine blocks, earn CC, auto-transfer to collection |
-| **Collection** | 7000      | Receive from miners, reward users for claims      |
-| **User**       | 5000+     | Claim rewards, transfer coins                     |
+| Type           | Ports     | Purpose                                            |
+| -------------- | --------- | -------------------------------------------------- |
+| **Miner**      | 3000-3002 | Mine blocks, earn CC, auto-transfer to collection  |
+| **Collection** | 7000      | Receive from miners, assign rewards to users       |
+| **Gateway**    | 8000      | API for website: create wallets, query blockchain  |
+| **User**       | 5000+     | Receive rewards, transfer coins                    |
 
 ## 🚀 Quick Start
 
@@ -91,20 +92,105 @@ python -m pip install -r requirements.txt
 # Or manually: python run_node.py 5000
 ```
 
+### 6. (Optional) Start Gateway API
+
+```powershell
+# Start Gateway API for frontend integration (port 8000)
+.\blockchain.ps1 start-gateway
+```
+
 ## 💻 Controller Commands
 
 Use the main controller script for all operations:
 
 ```powershell
-.\blockchain.ps1 start-network    # Start all nodes (auto peer connection)
+.\blockchain.ps1 start-network    # Start all nodes (restores if data exists, fresh if not)
 .\blockchain.ps1 start-mining     # Start mining on all miners
 .\blockchain.ps1 stop-mining      # Stop mining on all miners
 .\blockchain.ps1 create-user      # Create a new user node
+.\blockchain.ps1 start-gateway    # Start Gateway API (port 8000)
+.\blockchain.ps1 stop-gateway     # Stop Gateway API
 .\blockchain.ps1 status           # Check node status
-.\blockchain.ps1 stop-network     # Stop all nodes
+.\blockchain.ps1 stop-network     # Save data & stop all nodes
+.\blockchain.ps1 clear-data       # Clear all data for fresh start
 .\blockchain.ps1 build            # Build Cython extensions
 .\blockchain.ps1 help             # Show all commands
 ```
+
+## 💾 Data Persistence
+
+Blockchain and wallet data are automatically saved to disk and shared across all nodes:
+
+```
+data/
+├── blockchain.json      # Shared blockchain (all nodes)
+├── pending_tx.json      # Shared pending transactions
+├── wallets.json         # All registered wallets
+└── active_sessions.json # Currently active port-wallet mappings
+```
+
+**Key features:**
+
+- **Shared blockchain:** All nodes read/write to the same blockchain.json
+- **Wallet registry:** All wallets stored in wallets.json for easy testing
+- **Session tracking:** active_sessions.json tracks which wallet is on which port
+- **Auto-restore:** `start-network` restores existing wallets (loose coupling for miners)
+- **Stale session cleanup:** Sessions from crashed nodes are auto-cleaned on startup
+- **Wallet portability:** Use any wallet on any port via private key authentication
+
+**Clear data for fresh start:**
+
+```powershell
+.\blockchain.ps1 clear-data       # With confirmation prompt
+.\scripts\clear_storage.ps1 -Force   # Skip confirmation
+```
+
+**Manual save/shutdown:**
+
+```powershell
+# Save without stopping
+Invoke-RestMethod -Uri "http://localhost:3000/save" -Method POST
+
+# Save and prepare for shutdown
+Invoke-RestMethod -Uri "http://localhost:3000/shutdown" -Method POST
+```
+
+## 🔐 Wallet Authentication
+
+Wallets are now decoupled from ports. Any wallet can connect to any available port:
+
+### Create New Wallet
+
+```powershell
+# New wallet on auto-selected port
+.\blockchain.ps1 create-user
+
+# New wallet on specific port
+.\scripts\create_user_node.ps1 -Port 5000
+
+# Existing wallet on auto-selected port
+.\scripts\create_user_node.ps1 -PrivateKey "your_private_key_hex"
+
+# Existing wallet on specific port
+.\scripts\create_user_node.ps1 -Port 5005 -PrivateKey "your_private_key_hex"
+```
+
+### View All Wallets
+
+```powershell
+# List all registered wallets (shows private keys for testing)
+Invoke-RestMethod -Uri "http://localhost:7000/wallets"
+
+# View active sessions (which wallet is on which port)
+Invoke-RestMethod -Uri "http://localhost:7000/sessions"
+```
+
+### Session Rules
+
+- A wallet can only be active on ONE port at a time
+- A port can only have ONE wallet at a time
+- When a node stops, the session is freed (port and wallet become available)
+- Stale sessions (from crashed nodes) are auto-cleaned on next startup
 
 ## 💻 Manual Node Startup
 
@@ -119,8 +205,11 @@ python run_node.py 3000
 python run_node.py 3001
 python run_node.py 3002
 
-# Terminal 5: User Node
+# Terminal 5: New user with fresh wallet
 python run_node.py 5000
+
+# Terminal 6: Existing user with specific wallet
+python run_node.py 5001 "private_key_hex_here"
 ```
 
 **Note:** Nodes automatically discover and connect to each other via bootstrap peers!
