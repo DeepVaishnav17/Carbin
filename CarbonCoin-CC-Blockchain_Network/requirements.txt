@@ -1,0 +1,14 @@
+Flask>=2.0.0
+ecdsa>=0.18.0
+requests>=2.28.0
+
+# Cython for high-performance C extensions
+Cython>=3.0.0
+
+# Development and testing
+pytest>=7.0.0
+pytest-benchmark>=4.0.0
+
+# Build tools (Windows users need Visual Studio Build Tools)
+setuptools>=65.0.0
+wheel>=0.38.0
