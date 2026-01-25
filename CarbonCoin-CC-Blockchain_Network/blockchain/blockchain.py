@@ -1,9 +1,10 @@
 import time
 import threading
+from typing import List, Dict, Optional
 from blockchain.block import Block
 from config import (
     MINING_REWARD, MAX_TRANSACTIONS_PER_BLOCK, COINBASE_ADDRESS,
-    TransactionType, COIN_SYMBOL
+    TransactionType, COIN_SYMBOL, MINING_DIFFICULTY
 )
 
 # Try to use Cython-optimized mining
@@ -21,14 +22,50 @@ GENESIS_BLOCK = Block(
 )
 
 class Blockchain:
-    def __init__(self):
-        self.chain = [GENESIS_BLOCK]
+    def __init__(self, chain_data: Optional[List[Dict]] = None):
+        """
+        Initialize blockchain.
+        
+        Args:
+            chain_data: Optional list of block dictionaries to restore from disk
+        """
+        if chain_data:
+            # Restore chain from stored data
+            self.chain = self._restore_chain(chain_data)
+        else:
+            # Start with genesis block
+            self.chain = [GENESIS_BLOCK]
+        
         self.pending_transactions = []
-        self.difficulty = 3
+        self.difficulty = MINING_DIFFICULTY  # Use config value
         self._balance_cache = {}  # Cache for balance lookups
-        self._cache_chain_length = 1  # Track chain length when cache was built
+        self._cache_chain_length = len(self.chain)  # Track chain length when cache was built
         self._mined_tx_cache = set()  # Cache for mined transaction IDs
         self._lock = threading.RLock()  # Thread safety for balance operations
+    
+    def _restore_chain(self, chain_data: List[Dict]) -> List[Block]:
+        """
+        Restore blockchain from stored data.
+        
+        Args:
+            chain_data: List of block dictionaries
+            
+        Returns:
+            List of Block objects
+        """
+        chain = []
+        for block_dict in chain_data:
+            block = Block(
+                index=block_dict["index"],
+                timestamp=block_dict["timestamp"],
+                data=block_dict["data"],
+                previous_hash=block_dict["previous_hash"],
+                nonce=block_dict["nonce"]
+            )
+            # Restore the original hash (don't recalculate)
+            block.hash = block_dict["hash"]
+            chain.append(block)
+        return chain
 
     def get_latest_block(self):
         return self.chain[-1]

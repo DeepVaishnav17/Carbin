@@ -36,6 +36,9 @@ Thumbs.db
 *.log
 logs/
 
+# Blockchain data (persisted state - contains private keys!)
+data/
+
 # Wallet files (sensitive - private keys)
 *.wallet
 wallets/

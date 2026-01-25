@@ -73,6 +73,10 @@ class Wallet:
         """Get public key as hex string for verification."""
         return self.public_key.to_string().hex()
 
+    def get_private_key_hex(self) -> str:
+        """Get private key as hex string for storage/backup."""
+        return self.private_key.to_string().hex()
+
     @staticmethod
     def verify_signature(public_key_hex: str, message_hash: bytes, signature_hex: str) -> bool:
         """
