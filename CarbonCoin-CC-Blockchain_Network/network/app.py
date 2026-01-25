@@ -111,10 +111,22 @@ def handle_exceptions(f):
     return decorated_function
 
 
-def create_app(port: int = 5000):
-    """Create and configure the Flask app with the node."""
+def create_app(port: int = 5000, private_key: str = None):
+    """
+    Create and configure the Flask app with the node.
+    
+    Args:
+        port: Port number to run the node on
+        private_key: Optional private key hex to authenticate with existing wallet
+        
+    Returns:
+        Node instance
+        
+    Raises:
+        RuntimeError: If port is in use or wallet is already active
+    """
     global node
-    node = Node(port=port)
+    node = Node(port=port, private_key=private_key)
     
     # Connect to bootstrap peers on startup (all nodes)
     # This ensures new nodes discover the network automatically
@@ -127,7 +139,7 @@ def create_app(port: int = 5000):
     if port not in [7000, 3000, 3001, 3002]:
         node.register_with_network()
     
-    return app
+    return node
 
 # ==============================================================================
 # BASIC INFO
@@ -137,6 +149,7 @@ def create_app(port: int = 5000):
 @handle_exceptions
 def home():
     """Get node information."""
+    wallet_label = node._get_wallet_label() if hasattr(node, '_get_wallet_label') else None
     return jsonify({
         "success": True,
         "name": "CarbonCoin Node",
@@ -144,6 +157,7 @@ def home():
         "node_type": node.node_type,
         "port": node.port,
         "address": node.wallet.address(),
+        "wallet_label": wallet_label,
         "balance": node.get_balance(),
         "chain_length": len(node.blockchain.chain),
         "pending_transactions": len(node.blockchain.pending_transactions),
@@ -198,6 +212,66 @@ def get_all_balances():
         "success": True,
         "balances": formatted,
         "total_supply": sum(balances.values())
+    })
+
+@app.route('/wallets', methods=['GET'])
+@handle_exceptions
+def get_all_wallets():
+    """
+    Get all registered wallets in the system.
+    Useful for testing - shows all wallets with their private keys.
+    """
+    from storage.storage import Storage
+    storage = Storage()
+    wallets = storage.load_wallets()
+    sessions = storage.load_sessions()
+    
+    # Build wallet info list
+    wallet_list = []
+    for address, data in wallets.items():
+        # Find if wallet is active on any port
+        active_port = None
+        for port_str, active_addr in sessions.items():
+            if active_addr == address:
+                active_port = int(port_str)
+                break
+        
+        wallet_list.append({
+            "address": address,
+            "private_key": data.get("private_key"),
+            "label": data.get("label", ""),
+            "created_at": data.get("created_at"),
+            "active_on_port": active_port
+        })
+    
+    return jsonify({
+        "success": True,
+        "wallets": wallet_list,
+        "total_wallets": len(wallet_list)
+    })
+
+@app.route('/sessions', methods=['GET'])
+@handle_exceptions
+def get_active_sessions():
+    """
+    Get all active sessions (port-wallet mappings).
+    Shows which wallets are currently running on which ports.
+    """
+    from storage.storage import Storage
+    storage = Storage()
+    sessions = storage.load_sessions()
+    
+    session_list = []
+    for port_str, address in sessions.items():
+        session_list.append({
+            "port": int(port_str),
+            "wallet_address": address
+        })
+    
+    return jsonify({
+        "success": True,
+        "sessions": session_list,
+        "active_count": len(session_list)
     })
 
 @app.route('/peers', methods=['GET'])
@@ -307,10 +381,11 @@ def create_transaction():
         if success:
             return jsonify({
                 "success": True,
-                "message": "Transaction created",
+                "message": "Transaction submitted (pending confirmation)",
+                "status": "pending",
                 "amount": f"{amount} {COIN_SYMBOL}",
                 "receiver": receiver,
-                "new_balance": f"{node.get_balance():.2f} {COIN_SYMBOL}"
+                "note": "Balance will update after transaction is mined into a block"
             }), 201
         else:
             balance = node.get_balance()
@@ -408,10 +483,11 @@ def transfer():
     if success:
         return jsonify({
             "success": True,
-            "message": "Transfer successful",
+            "message": "Transfer submitted (pending confirmation)",
+            "status": "pending",
             "amount": f"{amount} {COIN_SYMBOL}",
             "receiver": receiver,
-            "new_balance": f"{node.get_balance():.2f} {COIN_SYMBOL}"
+            "note": "Balance will update after transaction is mined into a block"
         }), 201
     else:
         raise APIError(f"Insufficient balance. Have: {node.get_balance():.2f} {COIN_SYMBOL}", 400)
@@ -519,11 +595,12 @@ def assign_reward():
     """
     Collection node assigns reward to a user's wallet address.
     Only the collection node can call this endpoint.
-    Reward amount is fixed at ASSIGN_REWARD (5 CC) from config.
+    Reward amount defaults to ASSIGN_REWARD (5 CC) from config, but can be customized.
     
     POST /assign_reward
     Body: {
-        "user_address": "wallet_address_here"
+        "user_address": "wallet_address_here",
+        "amount": 10.0  (optional, defaults to 5 CC if not provided)
     }
     """
     # Only collection node can assign rewards
@@ -536,8 +613,20 @@ def assign_reward():
     if not user_address:
         raise APIError("user_address is required", 400)
     
-    # Fixed reward amount from config
-    amount = ASSIGN_REWARD
+    # Get amount from request, default to ASSIGN_REWARD if not provided
+    amount = data.get('amount')
+    if amount is None:
+        # Use default reward amount from config
+        amount = ASSIGN_REWARD
+    else:
+        # Validate custom amount
+        try:
+            amount = float(amount)
+        except (TypeError, ValueError):
+            raise APIError("Invalid amount value. Must be a number.", 400)
+        
+        if amount <= 0:
+            raise APIError("Amount must be greater than 0", 400)
     
     # Check collection has enough balance
     collection_balance = node.get_balance()
@@ -567,84 +656,15 @@ def assign_reward():
         daemon=True
     ).start()
     
-    # Track the reward assignment
-    import time
-    import hashlib
-    reward_id = hashlib.sha256(f"{user_address}_{time.time()}".encode()).hexdigest()[:16]
-    
-    with node._claims_lock:
-        node._claimed_rewards[reward_id] = {
-            "user_address": user_address,
-            "amount": amount,
-            "timestamp": time.time(),
-            "tx_id": tx_dict.get("tx_id"),
-            "status": "pending"
-        }
-    
     logger.info(f"[Reward] Assigned {amount} {COIN_SYMBOL} to {user_address[:16]}...")
     
     return jsonify({
         "success": True,
         "message": f"Reward of {amount} {COIN_SYMBOL} assigned to user",
-        "reward_id": reward_id,
         "tx_id": tx_dict.get("tx_id"),
         "amount": f"{amount} {COIN_SYMBOL}",
         "recipient": user_address
     }), 201
-
-
-@app.route('/reward_status/<reward_id>', methods=['GET'])
-@handle_exceptions
-def get_reward_status(reward_id):
-    """Get status of a specific reward assignment."""
-    if not node.is_collection():
-        raise APIError("Only collection node can check reward status", 403)
-    
-    claim = node.get_claim_status(reward_id)
-    if claim:
-        # Check if transaction is mined
-        tx_id = claim.get("tx_id")
-        is_mined = node.blockchain.is_transaction_mined(tx_id) if tx_id else False
-        
-        return jsonify({
-            "success": True,
-            "reward_id": reward_id,
-            "reward": {
-                "user_address": claim["user_address"],
-                "amount": f"{claim['amount']} {COIN_SYMBOL}",
-                "timestamp": claim["timestamp"],
-                "tx_id": tx_id,
-                "status": "confirmed" if is_mined else "pending"
-            }
-        })
-    else:
-        raise APIError("Reward not found", 404)
-
-
-@app.route('/rewards', methods=['GET'])
-@handle_exceptions
-def get_all_rewards():
-    """Get all assigned rewards (collection node only)."""
-    if not node.is_collection():
-        raise APIError("Only collection node can view rewards", 403)
-    
-    claims = node.get_all_claims()
-    
-    # Enrich with confirmation status
-    enriched_rewards = []
-    for claim in claims:
-        tx_id = claim.get("tx_id")
-        is_mined = node.blockchain.is_transaction_mined(tx_id) if tx_id else False
-        enriched_rewards.append({
-            **claim,
-            "status": "confirmed" if is_mined else "pending"
-        })
-    
-    return jsonify({
-        "success": True,
-        "total_rewards": len(enriched_rewards),
-        "rewards": enriched_rewards
-    })
 
 # ==============================================================================
 # BLOCK HANDLING
@@ -832,6 +852,56 @@ def stats():
         "pending_transactions": len(node.blockchain.pending_transactions),
         "peers_count": len(node.peers),
         "sync_active": node.sync_active
+    })
+
+# ==============================================================================
+# PERSISTENCE
+# ==============================================================================
+
+@app.route('/save', methods=['POST'])
+@handle_exceptions
+def save_state():
+    """
+    Save all node data to disk (blockchain, wallet, pending transactions, peers).
+    Should be called before shutting down the node to preserve data.
+    """
+    success = node.save_state()
+    
+    return jsonify({
+        "success": success,
+        "message": "State saved to disk" if success else "Failed to save state",
+        "port": node.port,
+        "chain_length": len(node.blockchain.chain),
+        "pending_transactions": len(node.blockchain.pending_transactions),
+        "peers_count": len(node.peers)
+    })
+
+@app.route('/shutdown', methods=['POST'])
+@handle_exceptions
+def shutdown():
+    """
+    Save state and prepare for shutdown.
+    This endpoint saves all data and stops background services.
+    Also ends the session (frees up the port and wallet).
+    """
+    # Stop all services first
+    if node.is_miner():
+        node.stop_mining_service()
+        node.stop_auto_transfer_service()
+    
+    node.stop_sync_service()
+    
+    # Save state to disk
+    success = node.save_state()
+    
+    # End the session (free up port and wallet)
+    node.end_session()
+    
+    return jsonify({
+        "success": success,
+        "message": "Node ready for shutdown" if success else "Shutdown preparation failed",
+        "port": node.port,
+        "data_saved": success
     })
 
 # ==============================================================================

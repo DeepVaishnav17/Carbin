@@ -6,10 +6,11 @@ from blockchain.block import Block
 from blockchain.blockchain import Blockchain
 from wallet.wallet import Wallet
 from transaction.transaction import Transaction
+from storage.storage import Storage
 from config import (
     NodeType, MINER_AUTO_TRANSFER_THRESHOLD, MINING_REWARD,
     get_node_type_from_port, COIN_SYMBOL, TransactionType,
-    COLLECTION_PORT, BOOTSTRAP_PEERS
+    COLLECTION_PORT, BOOTSTRAP_PEERS, AUTO_TRANSFER_ALL
 )
 
 # Configure logging
@@ -21,11 +22,54 @@ logger = logging.getLogger(__name__)
 
 
 class Node:
-    def __init__(self, port: int = 5000):
+    def __init__(self, port: int = 5000, private_key: str = None):
+        """
+        Initialize a blockchain node.
+        
+        Args:
+            port: Port number to run the node on
+            private_key: Optional private key hex to authenticate with existing wallet.
+                        If not provided, creates a new wallet.
+        """
         self.port = port
         self.node_type = get_node_type_from_port(port)
-        self.wallet = Wallet()
-        self.blockchain = Blockchain()
+        
+        # Initialize storage for persistence (shared across nodes)
+        self.storage = Storage(port)
+        
+        # Initialize wallet based on authentication
+        self.wallet = self._init_wallet(private_key)
+        
+        # Start session (validates port availability and wallet not already active)
+        success, error = self.storage.start_session(port, self.wallet.address())
+        if not success:
+            raise RuntimeError(f"Failed to start node: {error}")
+        
+        # Register wallet in shared registry
+        label = self._get_wallet_label()
+        self.storage.register_wallet(
+            self.wallet.get_private_key_hex(),
+            self.wallet.address(),
+            label=label
+        )
+        
+        # Load shared blockchain (same for all nodes) - with version tracking
+        chain_data, self._chain_version = self.storage.load_blockchain()
+        if chain_data:
+            self.blockchain = Blockchain(chain_data=chain_data)
+            logger.info(f"[Node] Loaded shared blockchain: {len(self.blockchain.chain)} blocks (v{self._chain_version})")
+        else:
+            self.blockchain = Blockchain()
+            self._chain_version = 0
+            logger.info("[Node] Started fresh blockchain with genesis block")
+        
+        # Load shared pending transactions - with version tracking
+        pending_tx, self._pending_version = self.storage.load_pending_transactions()
+        if pending_tx:
+            self.blockchain.pending_transactions = pending_tx
+            logger.info(f"[Node] Loaded {len(pending_tx)} pending transactions (v{self._pending_version})")
+        
+        # Peers are discovered dynamically via BOOTSTRAP_PEERS
         self.peers = set()
         
         # Thread safety
@@ -52,13 +96,64 @@ class Node:
         self._last_sync_time = 0
         self._sync_interval = 2  # seconds
         
-        # Reward claim tracking (only for collection node)
-        # Key: claim_id (hash of user_address + timestamp), Value: claim details
-        self._claimed_rewards = {}
-        self._claims_lock = threading.RLock()
-        
         logger.info(f"[Node] Initialized as {self.node_type.upper()} on port {port}")
         logger.info(f"[Node] Wallet address: {self.wallet.address()[:16]}...")
+    
+    def _init_wallet(self, private_key: str = None) -> Wallet:
+        """
+        Initialize wallet based on authentication.
+        
+        Args:
+            private_key: Optional private key hex for authentication.
+                        If provided, it MUST exist in the wallet registry.
+            
+        Returns:
+            Wallet instance
+            
+        Raises:
+            RuntimeError: If private key is provided but not found in registry
+        """
+        if private_key:
+            # Authenticate with existing wallet - private key MUST exist
+            wallet_data = self.storage.get_wallet_by_private_key(private_key)
+            if wallet_data:
+                logger.info(f"[Node] Authenticated with existing wallet: {wallet_data['address'][:16]}... (label: {wallet_data.get('label')})")
+                return Wallet(private_key_hex=private_key)
+            else:
+                # Private key not found - raise error instead of creating new wallet
+                logger.error(f"[Node] Private key not found in wallet registry!")
+                raise RuntimeError(
+                    "Invalid private key. The provided private key does not exist in the wallet registry. "
+                    "Please use a valid private key or create a new wallet without providing a key."
+                )
+        else:
+            # Create new wallet
+            wallet = Wallet()
+            logger.info(f"[Node] Created new wallet: {wallet.address()[:16]}...")
+            return wallet
+    
+    def _get_wallet_label(self) -> str:
+        """
+        Get label for the wallet.
+        - If wallet already exists in storage, return existing label (don't overwrite)
+        - Otherwise generate a new label based on node type
+        """
+        # First check if wallet already has a label in storage
+        existing_wallet = self.storage.get_wallet_by_address(self.wallet.address())
+        if existing_wallet and existing_wallet.get("label"):
+            return existing_wallet.get("label")
+        
+        # Generate new label based on node type
+        if self.node_type == NodeType.COLLECTION:
+            return "collection"
+        elif self.node_type == NodeType.MINER:
+            # Count existing miner wallets to get next number
+            existing_miners = self.storage.get_miner_count()
+            return f"miner_{existing_miners + 1}"
+        else:
+            # Count existing user wallets to get next number
+            existing_users = self.storage.get_user_count()
+            return f"user_{existing_users + 1}"
 
     def is_miner(self) -> bool:
         return self.node_type == NodeType.MINER
@@ -72,6 +167,74 @@ class Node:
     def get_balance(self) -> float:
         """Get current wallet balance."""
         return self.blockchain.get_balance(self.wallet.address())
+
+    # =========================================================================
+    # PERSISTENCE - WITH VERSION CONTROL
+    # =========================================================================
+
+    def save_state(self) -> bool:
+        """
+        Save shared blockchain and pending transactions to disk.
+        Uses versioned saving to prevent data loss from race conditions.
+        Called before shutting down to persist data.
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        logger.info(f"[Node] Saving state for port {self.port}...")
+        
+        # Use save_all which handles version conflicts and retries
+        success = self.storage.save_all(
+            chain=self.blockchain.chain,
+            pending_tx=self.blockchain.pending_transactions,
+            max_retries=5  # Retry up to 5 times on conflict
+        )
+        
+        if success:
+            logger.info(f"[Node] State saved successfully for port {self.port}")
+        else:
+            logger.error(f"[Node] Failed to save state for port {self.port}")
+        
+        return success
+    
+    def reload_from_disk(self) -> bool:
+        """
+        Reload blockchain and pending transactions from disk.
+        Call this when you detect version has changed.
+        
+        Returns:
+            True if reloaded successfully
+        """
+        try:
+            chain_data, self._chain_version = self.storage.load_blockchain()
+            if chain_data:
+                # Only replace if loaded chain is valid and longer/equal
+                if len(chain_data) >= len(self.blockchain.chain):
+                    self.blockchain = Blockchain(chain_data=chain_data)
+                    logger.info(f"[Node] Reloaded blockchain: {len(self.blockchain.chain)} blocks (v{self._chain_version})")
+            
+            pending_tx, self._pending_version = self.storage.load_pending_transactions()
+            # Merge pending transactions (don't lose any)
+            existing_ids = {tx.get('tx_id') for tx in self.blockchain.pending_transactions}
+            for tx in pending_tx:
+                if tx.get('tx_id') not in existing_ids:
+                    self.blockchain.pending_transactions.append(tx)
+            logger.info(f"[Node] Reloaded pending transactions (v{self._pending_version})")
+            
+            return True
+        except Exception as e:
+            logger.error(f"[Node] Failed to reload from disk: {e}")
+            return False
+    
+    def end_session(self) -> bool:
+        """
+        End the wallet session for this node.
+        Called when shutting down to release the port.
+        
+        Returns:
+            True if session ended, False otherwise
+        """
+        return self.storage.end_session(self.port)
 
     # =========================================================================
     # PEER MANAGEMENT & AUTO-DISCOVERY
@@ -650,15 +813,23 @@ class Node:
                         collection_address = self._get_collection_address()
                         
                         if collection_address:
+                            # Determine transfer amount
+                            if AUTO_TRANSFER_ALL:
+                                # Transfer ALL available balance (leaves 0)
+                                transfer_amount = available_balance
+                            else:
+                                # Transfer only threshold amount
+                                transfer_amount = MINER_AUTO_TRANSFER_THRESHOLD
+                            
                             success = self.create_transfer(
                                 receiver=collection_address,
-                                amount=MINER_AUTO_TRANSFER_THRESHOLD,
+                                amount=transfer_amount,
                                 tx_type=TransactionType.AUTO_TRANSFER
                             )
                             
                             if success:
-                                logger.info(f"[AutoTransfer] 💰 Transferred {MINER_AUTO_TRANSFER_THRESHOLD} {COIN_SYMBOL} "
-                                            f"to Collection Node. Available balance: {available_balance - MINER_AUTO_TRANSFER_THRESHOLD:.2f} {COIN_SYMBOL}")
+                                logger.info(f"[AutoTransfer] 💰 Transferred {transfer_amount:.2f} {COIN_SYMBOL} "
+                                            f"to Collection Node. Remaining: {available_balance - transfer_amount:.2f} {COIN_SYMBOL}")
                         else:
                             logger.warning("[AutoTransfer] Collection node address not available")
                 
@@ -791,13 +962,3 @@ class Node:
     # =========================================================================
     # COLLECTION NODE FUNCTIONS
     # =========================================================================
-
-    def get_claim_status(self, claim_id: str) -> dict:
-        """Get status of a specific claim."""
-        with self._claims_lock:
-            return self._claimed_rewards.get(claim_id)
-
-    def get_all_claims(self) -> dict:
-        """Get all processed claims (for admin/debugging)."""
-        with self._claims_lock:
-            return dict(self._claimed_rewards)
