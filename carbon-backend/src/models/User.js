@@ -47,9 +47,9 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     walletCreated: {
-  type: Boolean,
-  default: false,
-},
+      type: Boolean,
+      default: false,
+    },
 
   },
   { timestamps: true }

@@ -94,11 +94,26 @@ export default function Profile() {
         }
     };
 
+    const getWalletAddress = async () => {
+        try {
+            const res = await api.get("/wallet/address");
+            if (res.data.walletAddress) setWalletAddress(res.data.walletAddress);
+        } catch (err) {
+            console.log("Could not fetch address");
+        }
+    };
+
     const getBalance = async () => {
         try {
             setLoadingBalance(true);
             const res = await api.get("/wallet/balance");
             setBalance(res.data.balance);
+            if (res.data.walletAddress) {
+                setWalletAddress(res.data.walletAddress);
+            } else {
+                // If backend didn't return address with balance, try fetching it explicitly
+                getWalletAddress();
+            }
         } catch (err) {
             alert("Failed to fetch balance");
         } finally {
@@ -125,14 +140,24 @@ export default function Profile() {
     };
 
     // Auto-fetch balance when wallet tab is opened
+    const [walletAddress, setWalletAddress] = useState(user?.walletAddress || null);
+
     useEffect(() => {
-        if (activeTab === "wallet" && walletCreated && balance === null) {
-            getBalance();
+        // Debug logs
+        console.log("Profile Effect - User:", user);
+        console.log("Profile Effect - Wallet Address State:", walletAddress);
+
+        if (activeTab === "wallet" && walletCreated) {
+            if (balance === null) getBalance();
+            if (!walletAddress) {
+                console.log("Fetching wallet address explicitly...");
+                getWalletAddress();
+            }
         }
         if (activeTab === "activity" && walletCreated && transactions.length === 0) {
             getTransactions();
         }
-    }, [activeTab, walletCreated]);
+    }, [activeTab, walletCreated, user]);
 
     const getInitials = (name) => {
         if (!name) return "?";
@@ -175,20 +200,24 @@ export default function Profile() {
                         <OverviewIcon />
                         Overview
                     </button>
-                    <button
-                        className={`profile-nav-item ${activeTab === "wallet" ? "active" : ""}`}
-                        onClick={() => setActiveTab("wallet")}
-                    >
-                        <WalletIcon />
-                        Wallet
-                    </button>
-                    <button
-                        className={`profile-nav-item ${activeTab === "activity" ? "active" : ""}`}
-                        onClick={() => setActiveTab("activity")}
-                    >
-                        <ActivityIcon />
-                        My Activity
-                    </button>
+                    {user?.role !== 'admin' && (
+                        <button
+                            className={`profile-nav-item ${activeTab === "wallet" ? "active" : ""}`}
+                            onClick={() => setActiveTab("wallet")}
+                        >
+                            <WalletIcon />
+                            Wallet
+                        </button>
+                    )}
+                    {user?.role !== 'admin' && (
+                        <button
+                            className={`profile-nav-item ${activeTab === "activity" ? "active" : ""}`}
+                            onClick={() => setActiveTab("activity")}
+                        >
+                            <ActivityIcon />
+                            My Activity
+                        </button>
+                    )}
                     <button
                         className={`profile-nav-item ${activeTab === "settings" ? "active" : ""}`}
                         onClick={() => setActiveTab("settings")}
@@ -216,44 +245,46 @@ export default function Profile() {
                         </div>
 
                         <div className="profile-cards-grid">
-                            {/* Wallet Status Card */}
-                            <div className={`profile-stat-card ${!walletCreated ? "highlight" : ""}`}>
-                                <div className="profile-stat-header">
-                                    <div className="profile-stat-icon green">
-                                        <WalletIcon />
+                            {/* Wallet Status Card - Only for non-admin users */}
+                            {user?.role !== 'admin' && (
+                                <div className={`profile-stat-card ${!walletCreated ? "highlight" : ""}`}>
+                                    <div className="profile-stat-header">
+                                        <div className="profile-stat-icon green">
+                                            <WalletIcon />
+                                        </div>
                                     </div>
-                                </div>
-                                {walletCreated ? (
-                                    <>
-                                        <h2 className="profile-stat-value">{balance !== null ? balance : "---"}</h2>
-                                        <p className="profile-stat-label">Carbon Coins</p>
-                                        {balance === null && (
+                                    {walletCreated ? (
+                                        <>
+                                            <h2 className="profile-stat-value">{balance !== null ? balance : "---"}</h2>
+                                            <p className="profile-stat-label">Carbon Coins</p>
+                                            {balance === null && (
+                                                <button
+                                                    className="profile-action-btn secondary"
+                                                    onClick={getBalance}
+                                                    disabled={loadingBalance}
+                                                    style={{ marginTop: 16 }}
+                                                >
+                                                    {loadingBalance ? "Loading..." : "Load Balance"}
+                                                </button>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h3 className="profile-action-title">Create Your Wallet</h3>
+                                            <p className="profile-action-desc">
+                                                Get your Carbon Wallet to earn coins by attending events.
+                                            </p>
                                             <button
-                                                className="profile-action-btn secondary"
-                                                onClick={getBalance}
-                                                disabled={loadingBalance}
-                                                style={{ marginTop: 16 }}
+                                                className="profile-action-btn"
+                                                onClick={createWallet}
+                                                disabled={creating}
                                             >
-                                                {loadingBalance ? "Loading..." : "Load Balance"}
+                                                {creating ? "Creating..." : "Get My Wallet"}
                                             </button>
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <h3 className="profile-action-title">Create Your Wallet</h3>
-                                        <p className="profile-action-desc">
-                                            Get your Carbon Wallet to earn coins by attending events.
-                                        </p>
-                                        <button
-                                            className="profile-action-btn"
-                                            onClick={createWallet}
-                                            disabled={creating}
-                                        >
-                                            {creating ? "Creating..." : "Get My Wallet"}
-                                        </button>
-                                    </>
-                                )}
-                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Location Card */}
                             <div className="profile-stat-card">
@@ -319,6 +350,31 @@ export default function Profile() {
                                         {loadingBalance ? "..." : (balance !== null ? balance : "---")}
                                     </h2>
                                     <p className="profile-stat-label">Carbon Coins</p>
+
+                                    {/* Wallet Address Display - Only for regular users */}
+                                    {user.role === 'user' && (
+                                        <div style={{ marginTop: '20px' }}>
+
+                                            <div className="profile-wallet-address-container" style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontFamily: 'monospace' }}>
+                                                    {walletAddress || "Loading address..."}
+                                                </div>
+
+                                                <button
+                                                    onClick={() => {
+                                                        if (walletAddress) {
+                                                            navigator.clipboard.writeText(walletAddress);
+                                                            alert("Address copied!");
+                                                        }
+                                                    }}
+                                                    style={{ background: 'rgba(44, 255, 5, 0.1)', border: '1px solid rgba(44, 255, 5, 0.2)', color: '#2CFF05', cursor: 'pointer', fontSize: '12px', padding: '4px 12px', borderRadius: '4px', fontWeight: '500', transition: 'all 0.2s' }}
+                                                >
+                                                    Copy
+                                                </button>
+                                            </div>
+                                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Wallet Address</p>
+                                        </div>
+                                    )}
                                     <button
                                         className="profile-action-btn secondary"
                                         onClick={getBalance}

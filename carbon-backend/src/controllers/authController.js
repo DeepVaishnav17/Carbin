@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-  const verifyLink = `http://localhost:5000/api/auth/verify/${verifyToken}`;
+    const verifyLink = `http://localhost:5000/api/auth/verify/${verifyToken}`;
 
     await sendEmail(
       email,
@@ -78,8 +78,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-   await sendTokens(user, res);
-return res.json({ message: "Login successful" });
+    await sendTokens(user, res);
+    return res.json({ message: "Login successful" });
 
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -102,8 +102,8 @@ exports.refreshToken = async (req, res) => {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
-   await sendTokens(user, res);
-return res.json({ message: "Token refreshed" });
+    await sendTokens(user, res);
+    return res.json({ message: "Token refreshed" });
 
   } catch (err) {
     res.status(403).json({ message: "Refresh token expired" });
@@ -125,9 +125,29 @@ exports.setLocation = async (req, res) => {
   }
 };
 
+const Wallet = require("../models/Wallet");
+
 exports.getMe = async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
-  res.json(user);
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    // Self-healing: If wallet is created but address is missing in User
+    if (user.walletCreated && !user.walletAddress) {
+      const wallet = await Wallet.findOne({
+        $or: [{ user: user._id }, { user_id: user._id }]
+      }).lean();
+
+      if (wallet) {
+        // Fallback for address field name
+        user.walletAddress = wallet.walletAddress || wallet.wallet_address || wallet.address;
+        await user.save();
+      }
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching user" });
+  }
 };
 exports.logout = async (req, res) => {
   res.clearCookie("accessToken");

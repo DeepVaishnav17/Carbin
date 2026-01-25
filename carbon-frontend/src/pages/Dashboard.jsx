@@ -14,7 +14,7 @@ export default function Dashboard() {
       try {
         const res = await api.get("/auth/me");
         setWalletCreated(res.data.walletCreated);
-      } catch (err) {}
+      } catch (err) { }
       setLoading(false);
     };
 
@@ -43,14 +43,14 @@ export default function Dashboard() {
     }
   };
 
-const getTransactions = async () => {
-  try {
-    const res = await api.get("/wallet/transactions");
-    setTransactions(res.data.transactions);
-  } catch (err) {
-    alert("Failed to fetch transactions");
-  }
-};
+  const getTransactions = async () => {
+    try {
+      const res = await api.get("/wallet/transactions");
+      setTransactions(res.data.transactions);
+    } catch (err) {
+      alert("Failed to fetch transactions");
+    }
+  };
 
 
   if (loading) return <p>Loading...</p>;
@@ -84,36 +84,36 @@ const getTransactions = async () => {
             </p>
           )}
 
-         {transactions.length > 0 && (
-  <div style={{ marginTop: "20px" }}>
-    <h3>Recent Transactions</h3>
+          {transactions.length > 0 && (
+            <div style={{ marginTop: "20px" }}>
+              <h3>Recent Transactions</h3>
 
-    <table border="1" cellPadding="8" style={{ marginTop: "10px" }}>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Amount</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        {transactions.map((tx) => (
-          <tr key={tx.tx_id}>
-            <td>{tx.direction === "received" ? "⬇ Received" : "⬆ Sent"}</td>
-            <td>{tx.amount} CC</td>
-            <td>{tx.sender.slice(0, 10)}...</td>
-            <td>{tx.recipient.slice(0, 10)}...</td>
-            <td>
-              {new Date(tx.timestamp * 1000).toLocaleString()}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+              <table border="1" cellPadding="8" style={{ marginTop: "10px" }}>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((tx) => (
+                    <tr key={tx.tx_id}>
+                      <td>{tx.direction === "received" ? "⬇ Received" : "⬆ Sent"}</td>
+                      <td>{tx.amount} CC</td>
+                      <td>{tx.sender.slice(0, 10)}...</td>
+                      <td>{tx.recipient.slice(0, 10)}...</td>
+                      <td>
+                        {new Date(tx.timestamp * 1000).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
         </div>
       )}

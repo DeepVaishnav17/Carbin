@@ -46,13 +46,13 @@ const eventSchema = new mongoose.Schema(
       default: false,
     },
     rewardedUsers: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-],
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
 
-    
+
   },
   { timestamps: true }
 );

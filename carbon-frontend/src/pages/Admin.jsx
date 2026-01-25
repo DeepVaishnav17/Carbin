@@ -45,32 +45,32 @@ export default function Admin() {
   };
 
   const assignCoins = async (userId, eventId) => {
-  const amount = coins[userId];
+    const amount = coins[userId];
 
-  if (!amount) return alert("Enter coin amount");
+    if (!amount) return alert("Enter coin amount");
 
-  try {
-    const res = await api.post("/wallet/assign", {
-      userId,
-      eventId,
-      coins: amount,
-    });
+    try {
+      const res = await api.post("/wallet/assign", {
+        userId,
+        eventId,
+        coins: amount,
+      });
 
-    const data = res.data.data;
+      const data = res.data.data;
 
-    alert(`✅ ${data.amount} assigned\nTx ID: ${data.tx_id}`);
+      alert(`✅ ${data.amount} assigned\nTx ID: ${data.tx_id}`);
 
-    setCoins((prev) => ({
-      ...prev,
-      [userId]: "",
-    }));
+      setCoins((prev) => ({
+        ...prev,
+        [userId]: "",
+      }));
 
-    await fetchAll();   // ⭐ refresh events from DB
+      await fetchAll();   // ⭐ refresh events from DB
 
-  } catch (err) {
-    alert("❌ Failed to assign coins");
-  }
-};
+    } catch (err) {
+      alert("❌ Failed to assign coins");
+    }
+  };
 
 
   return (
