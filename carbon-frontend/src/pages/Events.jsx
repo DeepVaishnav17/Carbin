@@ -33,11 +33,11 @@ export default function Events() {
     const res = await api.get("/events/my-events");
     setMyEvents(res.data);
   };
-  
+
   const fetchPastEvents = async () => {
-  const res = await api.get("/events/past");
-  setPastEvents(res.data);
-};
+    const res = await api.get("/events/past");
+    setPastEvents(res.data);
+  };
 
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function Events() {
     fetchMyEvents();
     fetchPastEvents();
   }, [user]);
-  
+
 
   // -------- HANDLERS --------
   const handleChange = (e) => {
@@ -62,21 +62,21 @@ export default function Events() {
   };
 
   const handleJoin = async (eventId) => {
-  await api.post(`/events/join/${eventId}`);
+    await api.post(`/events/join/${eventId}`);
 
-  setEvents((prevEvents) =>
-    prevEvents.map((ev) => {
-      if (ev._id === eventId) {
-        return {
-          ...ev,
-          participants: [...ev.participants, user._id],
-          participantsCount: ev.participantsCount + 1,
-        };
-      }
-      return ev;
-    })
-  );
-};
+    setEvents((prevEvents) =>
+      prevEvents.map((ev) => {
+        if (ev._id === eventId) {
+          return {
+            ...ev,
+            participants: [...ev.participants, user._id],
+            participantsCount: ev.participantsCount + 1,
+          };
+        }
+        return ev;
+      })
+    );
+  };
 
 
   const handleViewParticipants = async (eventId) => {
@@ -102,75 +102,87 @@ export default function Events() {
     }));
   };
   const handleGetQR = async (eventId) => {
-  const res = await api.get(`/events/qr/${eventId}`);
+    const res = await api.get(`/events/qr/${eventId}`);
 
-  setQrMap((prev) => ({
-    ...prev,
-    [eventId]: res.data.qrImage,
-  }));
-};
-const handleArchive = async (eventId) => {
-  await api.post(`/events/archive/${eventId}`);
-  fetchEvents();
-  fetchMyEvents();
-};
+    setQrMap((prev) => ({
+      ...prev,
+      [eventId]: res.data.qrImage,
+    }));
+  };
+  const handleArchive = async (eventId) => {
+    await api.post(`/events/archive/${eventId}`);
+    fetchEvents();
+    fetchMyEvents();
+  };
 
 
 
   // -------- UI --------
   return (
     <div style={{ padding: "30px" }}>
-      <h2>Create Event</h2>
+      {user && (
+        <>
+          <h2>Create Event</h2>
 
-      <form onSubmit={handleCreate}>
-        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} />
-        <br /><br />
-        <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-        <br /><br />
-        <input type="date" name="date" value={form.date} onChange={handleChange} />
-        <br /><br />
-        <input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
-        <br /><br />
-        <button type="submit">Create Event</button>
-      </form>
+          <form onSubmit={handleCreate}>
+            <input name="title" placeholder="Title" value={form.title} onChange={handleChange} />
+            <br /><br />
+            <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
+            <br /><br />
+            <input type="date" name="date" value={form.date} onChange={handleChange} />
+            <br /><br />
+            <input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
+            <br /><br />
+            <button type="submit">Create Event</button>
+          </form>
 
-      <hr /><br />
-
-      {/* -------- MY EVENTS -------- */}
-      <h2>My Events</h2>
-      {myEvents.length === 0 ? (
-        <p>You haven't created any events yet</p>
-      ) : (
-        myEvents.map((event) => (
-          <div
-            key={event._id}
-            style={{
-              border: "2px solid green",
-              padding: "15px",
-              marginBottom: "15px",
-            }}
-          >
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
-            <p><b>Date:</b> {new Date(event.date).toDateString()}</p>
-            <p><b>Location:</b> {event.location}</p>
-            <p>
-              <b>Participants:</b> {event.participants.length} |{" "}
-              <b>Attended:</b> {event.attendedUsers.length}
-            </p>
-          </div>
-        ))
+          <hr /><br />
+        </>
       )}
 
-      <hr /><br />
+
+      {/* -------- MY EVENTS -------- */}
+      {user && (
+        <>
+          <h2>My Events</h2>
+          {myEvents.length === 0 ? (
+            <p>You haven't created any events yet</p>
+          ) : (
+            myEvents.map((event) => (
+              <div
+                key={event._id}
+                style={{
+                  border: "2px solid green",
+                  padding: "15px",
+                  marginBottom: "15px",
+                }}
+              >
+                <h3>{event.title}</h3>
+                <p>{event.description}</p>
+                <p><b>Date:</b> {new Date(event.date).toDateString()}</p>
+                <p><b>Location:</b> {event.location}</p>
+                <p>
+                  <b>Participants:</b> {event.participants.length} |{" "}
+                  <b>Attended:</b> {event.attendedUsers.length}
+                </p>
+              </div>
+            ))
+          )}
+
+          <hr /><br />
+        </>
+      )}
 
       {/* -------- ALL EVENTS -------- */}
       <h2>All Events</h2>
 
       {events.map((event) => {
         const isOrganizer = user && event.organizer._id === user._id;
+        // const alreadyJoined =
+        //   user && event.participants.includes(user._id);
         const alreadyJoined =
-          user && event.participants.includes(user._id);
+          user ? event.participants.includes(user._id) : false;
+
 
         return (
           <div
@@ -195,24 +207,33 @@ const handleArchive = async (eventId) => {
             </p>
 
             {!isOrganizer && !alreadyJoined && (
-              <button onClick={() => handleJoin(event._id)}>
-                Join Event
+              <button
+                onClick={() => {
+                  if (!user) {
+                    navigate("/login");
+                    return;
+                  }
+                  handleJoin(event._id);
+                }}
+              >
+                {user ? "Join Event" : "Login to Join"}
               </button>
             )}
 
+
             {alreadyJoined && (
-  <>
-    <p>You joined this event</p>
-    <button onClick={() => handleGetQR(event._id)}>
-      Get QR
-    </button>
-  </>
-)}
-{qrMap[event._id] && (
-  <div style={{ marginTop: "10px" }}>
-    <img src={qrMap[event._id]} alt="QR Code" width="150" />
-  </div>
-)}
+              <>
+                <p>You joined this event</p>
+                <button onClick={() => handleGetQR(event._id)}>
+                  Get QR
+                </button>
+              </>
+            )}
+            {qrMap[event._id] && (
+              <div style={{ marginTop: "10px" }}>
+                <img src={qrMap[event._id]} alt="QR Code" width="150" />
+              </div>
+            )}
 
 
 
@@ -226,13 +247,13 @@ const handleArchive = async (eventId) => {
 
             )}
             {isOrganizer && (
-  <button
-    style={{ marginLeft: "10px" }}
-    onClick={() => handleArchive(event._id)}
-  >
-    Archive Event
-  </button>
-)}
+              <button
+                style={{ marginLeft: "10px" }}
+                onClick={() => handleArchive(event._id)}
+              >
+                Archive Event
+              </button>
+            )}
 
             {selectedEvent === event._id && (
               <div
@@ -268,46 +289,46 @@ const handleArchive = async (eventId) => {
       })}
       <hr /><br />
 
-<h2>Past Events</h2>
+      <h2>Past Events</h2>
 
-{pastEvents.length === 0 ? (
-  <p>No past events yet</p>
-) : (
-  pastEvents.map((event) => {
-    const didAttend =
-      user && event.attendedUsers.includes(user._id);
+      {pastEvents.length === 0 ? (
+        <p>No past events yet</p>
+      ) : (
+        pastEvents.map((event) => {
+          const didAttend =
+            user && event.attendedUsers.includes(user._id);
 
-    return (
-      <div
-        key={event._id}
-        style={{
-          border: "2px solid orange",
-          padding: "15px",
-          marginBottom: "15px",
-        }}
-      >
-        <h3>{event.title}</h3>
-        <p>{event.description}</p>
-        <p><b>Date:</b> {new Date(event.date).toDateString()}</p>
-        <p><b>Location:</b> {event.location}</p>
-        <p><b>Organizer:</b> {event.organizer.name}</p>
+          return (
+            <div
+              key={event._id}
+              style={{
+                border: "2px solid orange",
+                padding: "15px",
+                marginBottom: "15px",
+              }}
+            >
+              <h3>{event.title}</h3>
+              <p>{event.description}</p>
+              <p><b>Date:</b> {new Date(event.date).toDateString()}</p>
+              <p><b>Location:</b> {event.location}</p>
+              <p><b>Organizer:</b> {event.organizer.name}</p>
 
-        <p>
-          <b>Participants:</b> {event.participants.length} |{" "}
-          <b>Attended:</b> {event.attendedUsers.length}
-        </p>
+              <p>
+                <b>Participants:</b> {event.participants.length} |{" "}
+                <b>Attended:</b> {event.attendedUsers.length}
+              </p>
 
-        {didAttend && (
-          <p style={{ color: "green" }}>
-            You attended this event ✅
-          </p>
-        )}
-      </div>
-    );
-  })
-)}
+              {didAttend && (
+                <p style={{ color: "green" }}>
+                  You attended this event ✅
+                </p>
+              )}
+            </div>
+          );
+        })
+      )}
 
     </div>
-    
+
   );
 }

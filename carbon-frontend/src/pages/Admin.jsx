@@ -5,12 +5,13 @@ export default function Admin() {
   const [events, setEvents] = useState([]);
   const [coins, setCoins] = useState({});
   const [wallets, setWallets] = useState({});
+  const [rewarded, setRewarded] = useState({});
 
   const fetchAll = async () => {
     const res = await api.get("/events/admin/all");
     setEvents(res.data);
 
-    // fetch wallets for all users
+    // Fetch wallets for all users
     const userIds = new Set();
     res.data.forEach((e) => {
       e.participants.forEach((p) => userIds.add(p._id));
@@ -43,18 +44,34 @@ export default function Admin() {
     }));
   };
 
-  const assignCoins = async (userId) => {
-    const amount = coins[userId];
-    if (!amount) return alert("Enter coin amount");
+  const assignCoins = async (userId, eventId) => {
+  const amount = coins[userId];
 
-    await api.post("/wallet/assign", {
+  if (!amount) return alert("Enter coin amount");
+
+  try {
+    const res = await api.post("/wallet/assign", {
       userId,
+      eventId,
       coins: amount,
     });
 
-    alert("Coins assigned!");
-    setCoins((prev) => ({ ...prev, [userId]: "" }));
-  };
+    const data = res.data.data;
+
+    alert(`✅ ${data.amount} assigned\nTx ID: ${data.tx_id}`);
+
+    setCoins((prev) => ({
+      ...prev,
+      [userId]: "",
+    }));
+
+    await fetchAll();   // ⭐ refresh events from DB
+
+  } catch (err) {
+    alert("❌ Failed to assign coins");
+  }
+};
+
 
   return (
     <div style={{ padding: "30px" }}>
@@ -70,8 +87,14 @@ export default function Admin() {
           }}
         >
           <h2>{event.title}</h2>
-          <p><b>Organizer:</b> {event.organizer.name}</p>
-          <p><b>Date:</b> {new Date(event.date).toDateString()}</p>
+
+          <p>
+            <b>Organizer:</b> {event.organizer.name}
+          </p>
+
+          <p>
+            <b>Date:</b> {new Date(event.date).toDateString()}
+          </p>
 
           <h3>Participants</h3>
 
@@ -80,14 +103,26 @@ export default function Admin() {
               (a) => a._id.toString() === p._id.toString()
             );
 
+            const alreadyRewarded = event.rewardedUsers?.some(
+              (r) => r.toString() === p._id.toString()
+            );
+
             return (
               <div key={p._id} style={{ marginBottom: "10px" }}>
-                <b>{p.name}</b> — {p.email} <br />
+                <b>{p.name}</b> — {p.email}
+                <br />
 
-                Wallet: {wallets[p._id] || "Loading..."} <br />
+                Wallet: {wallets[p._id] || "Loading..."}
+                <br />
 
                 {attended && (
                   <span style={{ color: "green" }}>Attended ✅</span>
+                )}
+
+                {alreadyRewarded && (
+                  <span style={{ marginLeft: "10px", color: "blue" }}>
+                    Coins Assigned ✅
+                  </span>
                 )}
 
                 <div style={{ marginTop: "5px" }}>
@@ -99,10 +134,12 @@ export default function Admin() {
                       handleCoinChange(p._id, e.target.value)
                     }
                   />
-                  <button onClick={() => assignCoins(p._id)}>
+
+                  <button onClick={() => assignCoins(p._id, event._id)}>
                     Assign Coins
                   </button>
                 </div>
+
                 <hr />
               </div>
             );

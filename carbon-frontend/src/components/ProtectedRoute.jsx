@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children }) {
 
   if (!user) return <Navigate to="/login" />;
 
-  if (!user.city || !user.apiCenter) {
+  if (!user.city) {
     return <Navigate to="/location" />;
   }
 
