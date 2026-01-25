@@ -50,7 +50,7 @@ app.use("/api/events", eventRoutes);
 // app.use("/api/wallet", walletRoutes);
 
 
-app.use("/api/wallet", require("./src/routes/wallet"));
+//app.use("/api/wallet", require("./src/routes/wallet"));
 
 
 console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
