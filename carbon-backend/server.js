@@ -46,8 +46,12 @@ app.use("/api/auth", authRoutes);
 const eventRoutes = require("./src/routes/eventRoutes");
 app.use("/api/events", eventRoutes);
 
-const walletRoutes = require("./src/routes/walletRoutes");
-app.use("/api/wallet", walletRoutes);
+// const walletRoutes = require("./src/routes/walletRoutes");
+// app.use("/api/wallet", walletRoutes);
+
+
+app.use("/api/wallet", require("./src/routes/wallet"));
+
 
 console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 

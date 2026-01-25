@@ -1,0 +1,454 @@
+/* =====================================================
+   ReAtmos Location Page Styles
+   Premium onboarding screen for location detection
+   ===================================================== */
+
+/* Location Page Container */
+.location-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+}
+
+/* Subtle noise texture */
+.location-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.015;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Background Effects */
+.location-bg-effects {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Grid pattern */
+.location-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+
+/* Graph lines */
+.location-graph-lines {
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+}
+
+.location-graph-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            #2CFF05 30%,
+            #2CFF05 70%,
+            transparent 100%);
+}
+
+.location-graph-line:nth-child(1) {
+    top: 20%;
+    left: 5%;
+    width: 40%;
+    animation: graphFloat 12s ease-in-out infinite;
+}
+
+.location-graph-line:nth-child(2) {
+    top: 40%;
+    right: 10%;
+    width: 35%;
+    animation: graphFloat 15s ease-in-out infinite 2s;
+}
+
+.location-graph-line:nth-child(3) {
+    bottom: 30%;
+    left: 15%;
+    width: 45%;
+    animation: graphFloat 18s ease-in-out infinite 4s;
+}
+
+.location-graph-line:nth-child(4) {
+    bottom: 15%;
+    right: 5%;
+    width: 30%;
+    animation: graphFloat 14s ease-in-out infinite 1s;
+}
+
+@keyframes graphFloat {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-5px);
+    }
+}
+
+/* Floating particles */
+.location-particles {
+    position: absolute;
+    inset: 0;
+}
+
+.location-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #2CFF05;
+    border-radius: 50%;
+    opacity: 0.1;
+}
+
+.location-particle:nth-child(1) {
+    top: 15%;
+    left: 20%;
+    animation: particlePulse 10s ease-in-out infinite;
+}
+
+.location-particle:nth-child(2) {
+    top: 25%;
+    right: 25%;
+    animation: particlePulse 12s ease-in-out infinite 1s;
+}
+
+.location-particle:nth-child(3) {
+    bottom: 35%;
+    left: 10%;
+    animation: particlePulse 14s ease-in-out infinite 2s;
+}
+
+.location-particle:nth-child(4) {
+    bottom: 20%;
+    right: 15%;
+    animation: particlePulse 11s ease-in-out infinite 3s;
+}
+
+.location-particle:nth-child(5) {
+    top: 50%;
+    left: 5%;
+    animation: particlePulse 13s ease-in-out infinite 1.5s;
+}
+
+.location-particle:nth-child(6) {
+    top: 60%;
+    right: 8%;
+    animation: particlePulse 15s ease-in-out infinite 2.5s;
+}
+
+@keyframes particlePulse {
+
+    0%,
+    100% {
+        opacity: 0.1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.3;
+        transform: scale(1.5);
+    }
+}
+
+/* Main Card */
+.location-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(45, 45, 45, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 48px 40px;
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo */
+.location-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.location-logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.location-logo-re {
+    color: #2CFF05;
+}
+
+.location-logo-atmos {
+    color: #ffffff;
+}
+
+/* Icon */
+.location-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.location-icon-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(44, 255, 5, 0.08);
+    border: 1px solid rgba(44, 255, 5, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.location-icon-circle svg {
+    width: 32px;
+    height: 32px;
+    color: #2CFF05;
+}
+
+/* Title */
+.location-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.01em;
+}
+
+/* Subtitle */
+.location-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.6;
+    margin: 0 0 32px 0;
+}
+
+/* Form */
+.location-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Detect Button */
+.location-detect-btn {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition:
+        background 200ms ease,
+        border-color 200ms ease,
+        box-shadow 200ms ease;
+}
+
+.location-detect-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(191, 0, 255, 0.3);
+    box-shadow: 0 0 16px rgba(191, 0, 255, 0.12);
+}
+
+.location-detect-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.location-detect-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Location Display */
+.location-display {
+    padding: 16px 20px;
+    background: rgba(44, 255, 5, 0.06);
+    border: 1px solid rgba(44, 255, 5, 0.15);
+    border-radius: 10px;
+}
+
+.location-display-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.location-display-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: #2CFF05;
+}
+
+.location-display-coords {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 4px;
+}
+
+/* Input Group */
+.location-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.location-input-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.location-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #ffffff;
+    background: #2D2D2D;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    outline: none;
+    transition:
+        border-color 200ms ease,
+        box-shadow 200ms ease;
+    box-sizing: border-box;
+}
+
+.location-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.location-input:focus {
+    border-color: rgba(44, 255, 5, 0.4);
+    box-shadow: 0 0 0 3px rgba(44, 255, 5, 0.1);
+}
+
+/* Divider */
+.location-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.location-divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.location-divider-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Submit Button */
+.location-submit {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #000000;
+    background: #2CFF05;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+        box-shadow 200ms ease,
+        transform 200ms ease;
+}
+
+.location-submit:hover {
+    box-shadow: 0 0 20px rgba(44, 255, 5, 0.3);
+}
+
+.location-submit:active {
+    transform: scale(0.98);
+}
+
+.location-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Error */
+.location-error {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Loading Spinner */
+.location-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    .location-card {
+        padding: 36px 24px;
+    }
+
+    .location-title {
+        font-size: 20px;
+    }
+
+    .location-subtitle {
+        font-size: 13px;
+    }
+}

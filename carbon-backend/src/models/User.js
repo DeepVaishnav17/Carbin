@@ -46,6 +46,11 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    walletCreated: {
+  type: Boolean,
+  default: false,
+},
+
   },
   { timestamps: true }
 );
