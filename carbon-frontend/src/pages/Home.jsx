@@ -92,6 +92,29 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Map Embed Section */}
+      {/* Map Portal Section */}
+      <section className={styles.iframeSection}>
+        <div className={styles.portalContainer}>
+          <div className={styles.portalContent}>
+            <h2 className={styles.portalTitle}>ReAtmos Global Map</h2>
+            <p className={styles.portalDesc}>
+              Explore real-time air quality data across the globe with our interactive 3D visualization.
+            </p>
+            <a
+              href="https://reatmos.onrender.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.portalButton}
+            >
+              Launch Global Map
+              <span className={styles.arrowIcon}>→</span>
+            </a>
+          </div>
+          <div className={styles.portalBackground}></div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
