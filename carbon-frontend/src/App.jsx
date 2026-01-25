@@ -13,6 +13,7 @@ import OAuthSuccess from "./pages/OAuthSuccess";
 import HomeRedirect from "./components/HomeRedirect";
 import PublicHome from "./pages/Home"; // reuse Home as public
 import ScanQR from "./pages/ScanQR";
+import Predict from "./pages/Predict";
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
           }
         />
         <Route path="/scan" element={<ScanQR />} />
+        <Route path="/predict" element={<Predict />} />
 
         <Route path="/oauth-success" element={<OAuthSuccess />} />
       </Routes>
