@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: reatmos-django
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn ReAtmosBackend.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ReAtmosBackend.settings
+      - key: PYTHON_VERSION
+        value: 3.11.8

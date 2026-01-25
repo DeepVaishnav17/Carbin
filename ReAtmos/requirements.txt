@@ -1,0 +1,15 @@
+django
+djangorestframework
+redis
+django-redis
+numpy
+pandas
+geopy
+requests
+django-cors-headers
+pymongo
+gunicorn
+whitenoise
+python-dotenv
+dj-database-url
+whitenoise

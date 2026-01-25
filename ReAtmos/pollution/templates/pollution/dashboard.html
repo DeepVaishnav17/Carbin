@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReAtmos Dashboard</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'pollution/css/dashboard.css' %}" />
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="brand">
+        <h2>ReAtmos</h2>
+        <span class="brand-sub">Air Quality Dashboard</span>
+      </div>
+
+      <!-- Cursor coords -->
+      <div class="card">
+        <div class="card-title">Current Cursor Coordinates</div>
+        <div id="sidebar-coords" class="coord-box">Move mouse over map...</div>
+      </div>
+
+      <!-- Selected Location Info -->
+      <div class="card">
+        <div class="card-title">Selected Location</div>
+
+        <div id="selected-info" class="selected-info">
+          <div class="empty-state">
+            Click any marker on the map to view details here.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Map Overlay for Coordinates -->
+    <div id="map-coords" class="map-coord-overlay">Lat: -, Lng: -</div>
+
+    <!-- Scripts -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <script src="{% static 'pollution/js/dashboard.js' %}"></script>
+  </body>
+</html>
