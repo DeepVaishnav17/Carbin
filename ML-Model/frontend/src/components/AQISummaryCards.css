@@ -1,0 +1,141 @@
+.aqi-cards-container {
+  margin: 30px 0;
+}
+
+.cards-title {
+  color: #2cff05;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Larger base width */
+  gap: 16px; /* Larger gap */
+  margin-bottom: 20px;
+}
+
+.aqi-card {
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 24px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 200px;
+}
+
+.aqi-card:hover {
+  background: #202020;
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.aqi-card.selected {
+  background: #202020;
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.card-day {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  gap: 2px;
+}
+
+.day-name {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.day-date {
+  color: #999999;
+  font-size: 12px;
+}
+
+.card-aqi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.aqi-value {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.aqi-label {
+  color: #666666;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-category {
+  width: 100%;
+  padding: 8px 6px;
+  border-left: 4px solid;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2cff05;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+  }
+
+  .cards-title {
+    font-size: 18px;
+  }
+
+  .aqi-card {
+    padding: 12px;
+  }
+
+  .aqi-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card-day {
+    margin-bottom: 8px;
+  }
+
+  .day-name {
+    font-size: 12px;
+  }
+
+  .day-date {
+    font-size: 10px;
+  }
+
+  .aqi-value {
+    font-size: 20px;
+  }
+
+  .card-category {
+    font-size: 9px;
+  }
+}

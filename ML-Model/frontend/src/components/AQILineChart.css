@@ -1,0 +1,51 @@
+.aqi-chart-container {
+  background: #111111;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: none;
+  box-shadow: 0 0 20px rgba(44, 255, 5, 0.1);
+}
+
+.chart-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.aqi-tooltip {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #2cff05;
+  border-radius: 8px;
+  padding: 12px;
+  color: #ffffff;
+}
+
+.tooltip-date {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #2cff05;
+}
+
+.tooltip-aqi {
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
+.tooltip-category {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .aqi-chart-container {
+    padding: 15px;
+  }
+
+  .chart-title {
+    font-size: 16px;
+  }
+}
