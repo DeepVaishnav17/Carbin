@@ -1,0 +1,9 @@
+﻿{
+  "name": "ml-model-frontend",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^18.0.0",
+    "axios": "^0.27.0",
+    "recharts": "^2.0.0"
+  }
+}
