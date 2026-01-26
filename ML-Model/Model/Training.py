@@ -45,5 +45,5 @@ for epoch in range(2000):
         print(f'Epoch [{epoch+1}/2000], Loss: {loss.item():.4f}')
 
 # 5. Save the Weights
-torch.save(model.state_dict(), 'pretrained_model.pth')
+torch.save(model.state_dict(), 'multivariate_model.pth')#replaced pretrained model to multivariate model
 print("Model saved as delhi_aqi_model.pth")
