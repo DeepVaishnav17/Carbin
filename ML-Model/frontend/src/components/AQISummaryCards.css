@@ -1,0 +1,17 @@
+﻿.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.card {
+  background-color: #ecf0f1;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.card h3 {
+  color: #2c3e50;
+}
