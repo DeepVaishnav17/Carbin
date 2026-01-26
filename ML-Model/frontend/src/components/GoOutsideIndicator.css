@@ -1,0 +1,29 @@
+﻿.go-outside-indicator {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.go-outside-indicator.safe {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+}
+
+.go-outside-indicator.safe h3 {
+  color: #155724;
+}
+
+.go-outside-indicator.unsafe {
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
+}
+
+.go-outside-indicator.unsafe h3 {
+  color: #721c24;
+}
+
+.aqi-value {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
