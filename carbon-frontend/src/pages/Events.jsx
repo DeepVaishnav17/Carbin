@@ -1,10 +1,12 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import "./Events.css";
 
 export default function Events() {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [events, setEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
@@ -86,8 +88,19 @@ export default function Events() {
   /* ================= ACTIONS ================= */
 
   const handleJoin = async (eventId) => {
-    await api.post(`/events/join/${eventId}`);
-    fetchEvents();
+    try {
+      await api.post(`/events/join/${eventId}`);
+      fetchEvents();
+      alert("Successfully joined event!");
+    } catch (err) {
+      if (err.response?.data?.message?.includes("Wallet")) {
+        if (confirm(err.response.data.message + ". Go to Wallet now?")) {
+          navigate("/profile", { state: { tab: "wallet" } });
+        }
+      } else {
+        alert(err.response?.data?.message || "Failed to join event");
+      }
+    }
   };
 
   const handleViewParticipants = async (eventId) => {

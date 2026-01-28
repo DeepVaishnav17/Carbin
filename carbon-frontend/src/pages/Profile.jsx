@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import "./Profile.css";
@@ -59,9 +59,10 @@ const CoinIcon = () => (
 
 export default function Profile() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, setUser } = useContext(AuthContext);
 
-    const [activeTab, setActiveTab] = useState("overview");
+    const [activeTab, setActiveTab] = useState(location.state?.tab || "overview");
     const [walletCreated, setWalletCreated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
