@@ -16,9 +16,9 @@ export default function ProtectedRoute({ children }) {
 
   if (!user) return <Navigate to="/login" />;
 
-  if (!user.city) {
-    return <Navigate to="/location" />;
-  }
+  // if (!user.city) {
+  //   return <Navigate to="/location" />;
+  // }
 
   return children;
 }
