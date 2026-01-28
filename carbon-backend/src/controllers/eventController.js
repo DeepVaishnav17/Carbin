@@ -165,7 +165,11 @@ exports.joinEvent = async (req, res) => {
     event.participants.push(userId);
     await event.save();
 
+    // Check for wallet address
     const user = await User.findById(userId);
+    if (!user || !user.walletAddress) {
+      return res.status(400).json({ message: "You must create a Wallet to join events" });
+    }
 
     // ✅ QR URL hosted by your backend
     const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
