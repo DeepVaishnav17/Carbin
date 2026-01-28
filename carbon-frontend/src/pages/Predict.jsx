@@ -39,12 +39,8 @@ const Predict = () => {
             //         area: area.trim(),
             //     },
             // });
-            const response = await axios.get(`/api/predict`, {
-                params: {
-                    state: state.trim(),
-                    area: area.trim(),
-                },
-            });
+
+            const response = await axios.get("/api/predict", { params: { state, area } })
 
 
             if (response.data.status === 'success') {
