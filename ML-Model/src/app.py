@@ -519,3 +519,6 @@ def api_info():
         },
         "note": "All predictions are automatically calibrated with real-time AQI data to account for model training on historical data"
     })
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0",port=5000, debug=False)
