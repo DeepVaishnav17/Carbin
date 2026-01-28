@@ -1,73 +1,29 @@
-.go-outside-container {
-  margin: 25px 0;
-  display: flex;
-  justify-content: center;
-}
-
-.decision-card {
-  background: rgba(44, 255, 5, 0.1);
-  border: 3px solid #2cff05;
-  border-radius: 15px;
-  padding: 30px;
+﻿.go-outside-indicator {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
   text-align: center;
-  max-width: 400px;
-  box-shadow: 0 0 25px rgba(44, 255, 5, 0.15);
-  transition: all 0.3s ease;
 }
 
-.decision-card:hover {
-  box-shadow: 0 0 35px rgba(44, 255, 5, 0.3);
-  transform: scale(1.02);
+.go-outside-indicator.safe {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
 }
 
-.decision-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  display: block;
-  animation: pulse 2s ease-in-out infinite;
+.go-outside-indicator.safe h3 {
+  color: #155724;
 }
 
-.decision-status {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+.go-outside-indicator.unsafe {
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
 }
 
-.decision-advice {
-  color: #cccccc;
-  font-size: 14px;
-  line-height: 1.6;
-  font-weight: 500;
+.go-outside-indicator.unsafe h3 {
+  color: #721c24;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .decision-card {
-    padding: 25px;
-    max-width: 100%;
-  }
-
-  .decision-icon {
-    font-size: 48px;
-  }
-
-  .decision-status {
-    font-size: 24px;
-  }
-
-  .decision-advice {
-    font-size: 12px;
-  }
+.aqi-value {
+  font-weight: bold;
+  font-size: 1.2rem;
 }

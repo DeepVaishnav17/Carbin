@@ -1,11 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 
-const Home = () => {
-    return (
-        <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <h1>Welcome to ReAtmos</h1>
-        </div>
-    );
-};
-
-export default Home;
+export default function Home() {
+  return (
+    <div className="home">
+      <h2>Welcome to AQI Prediction</h2>
+      <p>Using machine learning to predict air quality</p>
+    </div>
+  );
+}

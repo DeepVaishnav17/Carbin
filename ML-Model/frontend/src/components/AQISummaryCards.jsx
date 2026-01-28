@@ -1,53 +1,17 @@
-import React from 'react';
-import { getAQICategory, formatDate, getDayName } from '../utils/aqi-utils';
+﻿import React from 'react';
 import './AQISummaryCards.css';
 
-/**
- * AQI Summary Cards Component
- * Displays AQI values and categories for each day
- */
-const AQISummaryCards = ({ data, selectedDay, onDaySelect }) => {
+export default function AQISummaryCards({ data }) {
   return (
-    <div className="aqi-cards-container">
-      <h2 className="cards-title">  </h2>
-      <div className="cards-grid">
-        {data.map((dayData, index) => {
-          const category = getAQICategory(dayData.aqi);
-          const isSelected = index === selectedDay;
-
-          return (
-            <div
-              key={index}
-              className={`aqi-card ${isSelected ? 'selected' : ''}`}
-              onClick={() => onDaySelect(index)}
-            >
-              <div className="card-day">
-                <span className="day-name">{getDayName(dayData.date)}</span>
-                <span className="day-date">{formatDate(dayData.date)}</span>
-              </div>
-
-              <div className="card-aqi">
-                <span className="aqi-value">{dayData.aqi}</span>
-                <span className="aqi-label">AQI</span>
-              </div>
-
-              <div
-                className="card-category"
-                style={{
-                  backgroundColor: category.darkBg,
-                  borderLeftColor: category.bgColor,
-                }}
-              >
-                <span style={{ color: category.bgColor }}>
-                  {category.name}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+    <div className="summary-cards">
+      <div className="card">
+        <h3>PM2.5</h3>
+        <p>{data?.pm25 || 0}</p>
+      </div>
+      <div className="card">
+        <h3>PM10</h3>
+        <p>{data?.pm10 || 0}</p>
       </div>
     </div>
   );
-};
-
-export default AQISummaryCards;
+}

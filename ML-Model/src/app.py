@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify
 from flask_cors import CORS
 import torch
 import pandas as pd
@@ -507,12 +507,12 @@ def api_info():
             "training_data_age": "1 year"
         },
         "aqi_categories": {
-            "0-50": "Good 😊",
-            "51-100": "Moderate 😐",
-            "101-150": "Unhealthy for Sensitive Groups ⚠️",
-            "151-200": "Unhealthy ❌",
-            "201-300": "Very Unhealthy 🔴",
-            "301+": "Hazardous 💀"
+            "0-50": "Good ",
+            "51-100": "Moderate",
+            "101-150": "Unhealthy for Sensitive Groups",
+            "151-200": "Unhealthy",
+            "201-300": "Very Unhealthy",
+            "301+": "Hazardous"
         },
         "note": "All predictions are automatically calibrated with real-time AQI data to account for model training on historical data"
     })

@@ -1,51 +1,12 @@
-.aqi-chart-container {
-  background: #111111;
-  border-radius: 12px;
-  padding: 20px;
-  margin: 20px 0;
-  border: none;
-  box-shadow: 0 0 20px rgba(44, 255, 5, 0.1);
-}
-
-.chart-title {
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.aqi-tooltip {
-  background: rgba(0, 0, 0, 0.95);
-  border: 2px solid #2cff05;
+﻿.chart-container {
+  padding: 1.5rem;
+  background-color: white;
   border-radius: 8px;
-  padding: 12px;
-  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 1rem 0;
 }
 
-.tooltip-date {
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: #2cff05;
-}
-
-.tooltip-aqi {
-  margin-bottom: 4px;
-  color: #ffffff;
-}
-
-.tooltip-category {
-  font-weight: 600;
-  font-size: 12px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .aqi-chart-container {
-    padding: 15px;
-  }
-
-  .chart-title {
-    font-size: 16px;
-  }
+.chart-container h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
 }

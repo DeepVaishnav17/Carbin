@@ -1,49 +1,17 @@
-import React from 'react';
-import { getHealthAdvice, getAQICategory } from '../utils/aqi-utils';
+﻿import React from 'react';
 import './HealthAdvisory.css';
 
-/**
- * Health Advisory Component
- * Displays health recommendations based on AQI value
- */
-const HealthAdvisory = ({ aqi }) => {
-  const advice = getHealthAdvice(aqi);
-  const category = getAQICategory(aqi);
+export default function HealthAdvisory({ aqi }) {
+  const getAdvisory = (aqi) => {
+    if (aqi <= 50) return 'Air quality is satisfactory';
+    if (aqi <= 100) return 'Acceptable quality, but some pollutants may be a concern';
+    return 'Unhealthy - Consider limiting outdoor activities';
+  };
 
   return (
-    <div className="health-advisory-container">
-      <h2 className="advisory-title">Health Advisory</h2>
-
-      <div
-        className="advisory-category"
-        style={{
-          backgroundColor: category.darkBg,
-          borderLeftColor: category.bgColor,
-        }}
-      >
-        <span style={{ color: category.bgColor, fontWeight: 700 }}>
-          Current Level: {category.name}
-        </span>
-      </div>
-
-      <div className="advisory-cards">
-        <div className="advisory-card">
-          <div className="card-header">General Population</div>
-          <p className="card-content">{advice.general}</p>
-        </div>
-
-        <div className="advisory-card">
-          <div className="card-header">Children & Elderly</div>
-          <p className="card-content">{advice.sensitive}</p>
-        </div>
-
-        <div className="advisory-card">
-          <div className="card-header">People with Asthma/Heart Conditions</div>
-          <p className="card-content">{advice.vulnerable}</p>
-        </div>
-      </div>
+    <div className="health-advisory">
+      <h3>Health Advisory</h3>
+      <p>{getAdvisory(aqi)}</p>
     </div>
   );
-};
-
-export default HealthAdvisory;
+}
