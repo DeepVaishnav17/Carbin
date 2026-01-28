@@ -61,23 +61,36 @@ def get_prediction(state_name, area_name):
     state_name_lower = state_name.lower()
     area_name_lower = area_name.lower()
     
+    print(f"CSV Columns: {df.columns.tolist()}")
+    print(f"Searching for state='{state_name}', area='{area_name}'")
+    print(f"Available states: {df['state'].unique()[:10]}")
+    print(f"Available areas: {df['area'].unique()[:10]}")
+    
+    # Filter data by state and area
     data = df[(df['state'].str.lower() == state_name_lower) & (df['area'].str.lower() == area_name_lower)].copy()
+    
+    print(f"Filtered data rows: {len(data)}")
+    
     if data.empty:
-        return None, f"Area not found in database. Check spelling of state '{state_name}' and area '{area_name}'."
+        return None, f"Area not found in database. Available states: {df['state'].unique().tolist()}"
 
-    data['date'] = pd.to_datetime(data['date'], format='%d-%m-%Y')
-    series = data.sort_values('date')['aqi_value'].reset_index(drop=True)
+    # Get AQI values (no date parsing needed)
+    aqi_values = data['aqi_value'].dropna().values
+    
+    print(f"AQI values count: {len(aqi_values)}")
 
     # Use available data (minimum 7 days)
-    if len(series) < 7:
-        return None, f"Not enough historical data for {area_name} (found {len(series)} days, need minimum 7)."
+    if len(aqi_values) < 7:
+        return None, f"Not enough historical data for {area_name} (found {len(aqi_values)} records, need minimum 7)."
 
     # Use last 30 days if available, otherwise use all available data
-    window_size = min(30, len(series))
+    window_size = min(30, len(aqi_values))
     
     # Create multivariate features (23 dimensions)
+    series = aqi_values[-window_size:]  # Take last window_size values
+    
     features_df = pd.DataFrame(index=range(len(series)))
-    features_df['aqi'] = series.values
+    features_df['aqi'] = series
     
     # Lag features (days 1-7)
     for i in range(1, 8):
@@ -109,8 +122,8 @@ def get_prediction(state_name, area_name):
     # Fill NaN values using ffill and bfill
     features_df = features_df.bfill().ffill()
     
-    # Select last window_size days
-    recent_data = features_df.iloc[-window_size:].values
+    # Select all data
+    recent_data = features_df.values
     
     # Normalize the features
     scaler = MinMaxScaler(feature_range=(0, 1))
@@ -123,8 +136,8 @@ def get_prediction(state_name, area_name):
     
     prediction_actual = prediction_scaled.numpy().flatten()  # Shape (7,)
     
-    dummy_for_transform = np.tile(scaled_data[-1, :], (7, 1))  # Repeat last row 7 times
-    dummy_for_transform[:, 0] = prediction_actual  # Put predictions in AQI column
+    dummy_for_transform = np.tile(scaled_data[-1, :], (7, 1))
+    dummy_for_transform[:, 0] = prediction_actual
     
     prediction_actual = scaler.inverse_transform(dummy_for_transform)[:, 0]
     
@@ -132,40 +145,46 @@ def get_prediction(state_name, area_name):
 
 @app.route('/predict', methods=['GET'])
 def predict_endpoint():
-    state = request.args.get('state')
-    area = request.args.get('area')
+    try:
+        state = request.args.get('state')
+        area = request.args.get('area')
 
-    if not state or not area:
-        return jsonify({"error": "Please provide state and area parameters"}), 400
+        if not state or not area:
+            return jsonify({"error": "Please provide state and area parameters"}), 400
 
-    forecast, error = get_prediction(state, area)
-    
-    if error:
-        return jsonify({"status": "error", "message": error}), 404
-    
-    # Use forecast directly
-    average_aqi = sum(forecast) / len(forecast)
-    overall_condition = get_aqi_condition(average_aqi)
-    
-    forecast_by_day = [
-        {
-            "day": i + 1,
-            "aqi": round(aqi_val, 2),
-            "category": get_aqi_condition(aqi_val),
-            "emoji": get_aqi_emoji(aqi_val)
-        }
-        for i, aqi_val in enumerate(forecast)
-    ]
-    
-    return jsonify({
-        "status": "success",
-        "state": state,
-        "area": area,
-        "forecast": forecast_by_day,
-        "average_aqi": round(average_aqi, 2),
-        "condition": overall_condition,
-        "note": "7-day AQI forecast based on historical data."
-    })
+        forecast, error = get_prediction(state, area)
+        
+        if error:
+            return jsonify({"status": "error", "message": error}), 404
+        
+        # Use forecast directly
+        average_aqi = sum(forecast) / len(forecast)
+        overall_condition = get_aqi_condition(average_aqi)
+        
+        forecast_by_day = [
+            {
+                "day": i + 1,
+                "aqi": round(aqi_val, 2),
+                "category": get_aqi_condition(aqi_val),
+                "emoji": get_aqi_emoji(aqi_val)
+            }
+            for i, aqi_val in enumerate(forecast)
+        ]
+        
+        return jsonify({
+            "status": "success",
+            "state": state,
+            "area": area,
+            "forecast": forecast_by_day,
+            "average_aqi": round(average_aqi, 2),
+            "condition": overall_condition,
+            "note": "7-day AQI forecast based on historical data."
+        })
+    except Exception as e:
+        print(f"Error in /predict: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():
