@@ -33,12 +33,19 @@ const Predict = () => {
         setForecastData(null);
 
         try {
-            const response = await axios.get(`${import.meta.env.VITE_ML_API_URL || "http://15.207.84.129:5000"}/predict`, {
+            // const response = await axios.get(`${import.meta.env.VITE_ML_API_URL || "http://3.110.179.98:5000"}/predict`, {
+            //     params: {
+            //         state: state.trim(),
+            //         area: area.trim(),
+            //     },
+            // });
+            const response = await axios.get(`/api/predict`, {
                 params: {
                     state: state.trim(),
                     area: area.trim(),
                 },
             });
+
 
             if (response.data.status === 'success') {
                 // Add date field to forecast data for components
