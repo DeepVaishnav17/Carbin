@@ -21,8 +21,8 @@ const allowedOrigin = process.env.FRONTEND_URL;
 
 app.use(
   cors({
-   origin: "http://localhost:5173",
-   //origin: allowedOrigin,
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    //origin: allowedOrigin,
     credentials: true,
   })
 );
@@ -58,6 +58,10 @@ console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

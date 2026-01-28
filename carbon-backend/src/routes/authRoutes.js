@@ -36,8 +36,8 @@ router.get(
   async (req, res) => {
     await sendTokens(req.user, res); // sets httpOnly cookie
 
-   return res.redirect("http://localhost:5173/oauth-success");
-   //return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
+    //return res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
 
   }
 );

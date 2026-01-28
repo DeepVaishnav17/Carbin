@@ -33,7 +33,7 @@ const Predict = () => {
         setForecastData(null);
 
         try {
-            const response = await axios.get('http://43.205.238.114:5000/predict', {
+            const response = await axios.get(`${import.meta.env.VITE_ML_API_URL || "http://43.205.238.114:5000"}/predict`, {
                 params: {
                     state: state.trim(),
                     area: area.trim(),
@@ -62,7 +62,7 @@ const Predict = () => {
             if (err.response?.data?.message) {
                 setError(err.response.data.message);
             } else if (err.message === 'Network Error') {
-                setError('Unable to connect to the server. Make sure the Flask backend is running on http://localhost:5000');
+                setError(`Unable to connect to the server. Make sure the Flask backend is running on ${import.meta.env.VITE_ML_API_URL || "http://localhost:5000"}`);
             } else {
                 setError('Error fetching forecast. Please try again.');
             }

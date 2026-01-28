@@ -54,7 +54,7 @@ exports.scanQR = async (req, res) => {
 
 
 exports.getAllEvents = async (req, res) => {
-    
+
 
   try {
     await autoArchiveEvents();
@@ -168,19 +168,19 @@ exports.joinEvent = async (req, res) => {
     const user = await User.findById(userId);
 
     // ✅ QR URL hosted by your backend
-    const qrImageUrl = `http://localhost:5000/api/events/qr/${eventId}/${userId}`;
+    const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
 
-await sendEmail(
-  user.email,
-  `QR Code for ${event.title}`,
-  `
+    await sendEmail(
+      user.email,
+      `QR Code for ${event.title}`,
+      `
     <h2>You successfully joined "${event.title}"</h2>
     <p>Show this QR code to the organizer:</p>
     <img src="${qrImageUrl}" style="width:250px;height:250px;" />
     <p><b>Location:</b> ${event.location}</p>
     <p><b>Date:</b> ${new Date(event.date).toDateString()}</p>
   `
-);
+    );
 
 
     res.json({ message: "Joined event. QR sent to your email!" });
@@ -261,9 +261,9 @@ exports.markAttendance = async (req, res) => {
     const eventId = req.params.id;
     const userId = req.body?.userId;
 
-if (!userId) {
-  return res.status(400).json({ message: "userId required in body" });
-}
+    if (!userId) {
+      return res.status(400).json({ message: "userId required in body" });
+    }
 
     const event = await Event.findById(eventId);
 
@@ -323,7 +323,7 @@ exports.generateQR = async (req, res) => {
     }
 
     // user must be participant
-    if (!event.participants.some(id => id.toString() === userId)){
+    if (!event.participants.some(id => id.toString() === userId)) {
       return res.status(400).json({ message: "Join event first" });
     }
 
