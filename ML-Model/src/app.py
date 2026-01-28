@@ -13,13 +13,16 @@ app = Flask(__name__)
 CORS(app)
 
 # --- GLOBAL CONFIG ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MODEL_PATH = os.path.join(BASE_DIR, 'Model', 'multivariate_model.pth')
 DATA_PATH = os.path.join(BASE_DIR, 'Dataset', 'new_aqi.csv')
 
 model = AQILSTM()
-model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu'), weights_only=True))
+model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
 model.eval()
+
+print("Model loaded from:", MODEL_PATH)
+print("Dataset loaded from:", DATA_PATH)
 
 df = pd.read_csv(DATA_PATH)
 
@@ -516,6 +519,3 @@ def api_info():
         },
         "note": "All predictions are automatically calibrated with real-time AQI data to account for model training on historical data"
     })
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0",port=5000, debug=False)

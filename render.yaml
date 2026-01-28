@@ -1,9 +1,0 @@
-# services:
-#   - type: web
-#     name: ml-model-service
-#     env: python
-#     rootDir: ML-Model
-#     buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
-#     startCommand: gunicorn src.app:app
-#     runtime: python
-#     pythonVersion: 3.10.13
