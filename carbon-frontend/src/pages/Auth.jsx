@@ -75,9 +75,8 @@ export default function Auth() {
 
       if (me.data.role === "admin") {
         navigate("/admin", { replace: true });
-      } else if (!me.data.city) {
-        navigate("/location", { replace: true }); // ask for location first time
       } else {
+        // ✅ Direct access, no location check
         navigate("/profile", { replace: true });
       }
     } catch (err) {
@@ -95,23 +94,33 @@ export default function Auth() {
     }
 
     try {
-      const res = await api.post("/auth/register", {
+      // Register (now auto-logs in or returns success)
+      await api.post("/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password,
       });
-      // Show success and switch to login
-      setMode("login");
-      setForm({ name: "", email: "", password: "", confirmPassword: "" });
-      alert(res.data.message);
+
+      // Show success and auto-login logic if implemented, or just switch
+      // Since we changed backend to sendTokens, we might want to just fetchUser and redirect.
+      // But purely following "return message" logic:
+
+      // Attempt login immediately
+      await api.post("/auth/login", {
+        email: form.email,
+        password: form.password,
+      });
+      await fetchUser();
+      navigate("/profile", { replace: true });
+
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     }
   };
 
-  const handleGoogleAuth = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/google`;
-  };
+  // const handleGoogleAuth = () => {
+  //   window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/google`;
+  // };
 
   return (
     <div className="auth-page">
@@ -305,10 +314,11 @@ export default function Auth() {
           </div>
 
           {/* Google OAuth */}
-          <button type="button" className="auth-oauth" onClick={handleGoogleAuth}>
+          {/* Google OAuth (Disabled) */}
+          {/* <button type="button" className="auth-oauth" onClick={handleGoogleAuth}>
             <GoogleIcon />
             Continue with Google
-          </button>
+          </button> */}
 
           {/* Secondary Link */}
           <div className="auth-secondary">

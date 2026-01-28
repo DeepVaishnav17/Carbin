@@ -19,43 +19,21 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      isVerified: true, // ✅ Auto-verify
     });
 
-    // Create verification token
-    const verifyToken = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    // Instead of email, just log them in or say success
+    await sendTokens(user, res);
+    res.status(201).json({ message: "Registration successful" });
 
-    const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify/${verifyToken}`;
-
-    await sendEmail(
-      email,
-      "Verify your Carbon Account",
-      `<h3>Click below to verify your account</h3>
-       <a href="${verifyLink}">Verify Account</a>`
-    );
-
-    res.status(201).json({ message: "Verification email sent" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
 exports.verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.params;
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    await User.findByIdAndUpdate(decoded.id, { isVerified: true });
-
-    res.redirect(`${process.env.FRONTEND_URL}/login?verified=true`);
-
-  } catch (err) {
-    res.status(400).send("Invalid or expired link");
-  }
+  // Deprecated but kept for compatibility if needed
+  res.status(200).send("Email verification is disabled.");
 };
 
 exports.login = async (req, res) => {
@@ -68,9 +46,9 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    if (!user.isVerified) {
-      return res.status(400).json({ message: "Please verify your email first" });
-    }
+    // if (!user.isVerified) {
+    //   return res.status(400).json({ message: "Please verify your email first" });
+    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
 

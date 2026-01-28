@@ -31,9 +31,8 @@ export default function Login() {
 
       if (me.data.role === "admin") {
         navigate("/admin");
-      } else if (!me.data.city) {
-        navigate("/location");
       } else {
+        // Direct access
         navigate("/");
       }
     } catch (err) {
@@ -59,7 +58,7 @@ export default function Login() {
 
         <button type="submit">Login</button>
 
-        <button
+        {/* <button
           type="button"
           onClick={() => {
             window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/google`;
@@ -67,7 +66,7 @@ export default function Login() {
           }}
         >
           Login with Google
-        </button>
+        </button> */}
       </form>
     </div>
   );
