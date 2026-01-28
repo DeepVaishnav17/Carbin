@@ -8,28 +8,29 @@ import Footer from "../components/Footer";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  // No location check for Home page
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const res = await api.get("/auth/me");
+  // useEffect(() => {
+  //   const checkUser = async () => {
+  //     try {
+  //       const res = await api.get("/auth/me");
 
-        if (!res.data.city || !res.data.apiCenter) {
-          navigate("/location");
-          return;
-        }
-      } catch (err) {
-        // User not logged in, just show landing page
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       if (!res.data.city || !res.data.apiCenter) {
+  //         navigate("/location");
+  //         return;
+  //       }
+  //     } catch (err) {
+  //       // User not logged in, just show landing page
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    checkUser();
-  }, [navigate]);
+  //   checkUser();
+  // }, [navigate]);
 
-  if (loading) return <div style={{ background: '#000', height: '100vh', width: '100vw' }}></div>;
+  // if (loading) return <div style={{ background: '#000', height: '100vh', width: '100vw' }}></div>;
 
   return (
     <div className={styles.homeContainer}>
