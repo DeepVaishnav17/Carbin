@@ -7,4 +7,7 @@ coverage
 dist
 build
 
+/node_modules
+.env
+
 .gitignore

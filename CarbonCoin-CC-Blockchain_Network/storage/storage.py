@@ -71,7 +71,9 @@ class Storage:
     - Checksum verification to detect changes
     """
     
-    BASE_DIR = "data"
+    # Use absolute path to ensure data is always stored in the project/data directory
+    # regardless of where the script is run from (CWD)
+    BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     
     # File paths (shared across all nodes)
     BLOCKCHAIN_FILE = "blockchain.json"

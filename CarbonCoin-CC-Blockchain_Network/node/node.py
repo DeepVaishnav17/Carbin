@@ -1,6 +1,7 @@
 import requests
 import threading
 import time
+import os
 import logging
 from blockchain.block import Block
 from blockchain.blockchain import Blockchain
@@ -90,7 +91,7 @@ class Node:
         
         # Collection node address (set when collection node registers)
         self.collection_node_address = None
-        self.collection_node_url = f"http://localhost:{COLLECTION_PORT}"
+        self.collection_node_url = os.getenv("COLLECTION_NODE_URL", f"http://localhost:{COLLECTION_PORT}")
         
         # Track last sync time
         self._last_sync_time = 0
@@ -259,7 +260,7 @@ class Node:
             
             with self._peers_lock:
                 # Don't add self
-                if f"localhost:{self.port}" in peer_url or f"127.0.0.1:{self.port}" in peer_url:
+                if self._is_me(peer_url):
                     return False
                 
                 # Check if already exists
@@ -287,7 +288,8 @@ class Node:
         Announce a new peer to all existing peers.
         This spreads peer information across the network.
         """
-        my_url = f"http://localhost:{self.port}"
+        host_ip = os.getenv("HOST_IP", "localhost")
+        my_url = f"http://{host_ip}:{self.port}"
         
         with self._peers_lock:
             peers_copy = set(self.peers)
@@ -324,17 +326,31 @@ class Node:
         except:
             pass
 
+    def _is_me(self, url: str) -> bool:
+        """Check if a URL refers to this node."""
+        if not url:
+            return False
+            
+        host_ip = os.getenv("HOST_IP", "localhost")
+        identifiers = [
+            f"localhost:{self.port}",
+            f"127.0.0.1:{self.port}",
+            f"0.0.0.0:{self.port}",
+            f"{host_ip}:{self.port}"
+        ]
+        
+        return any(x in url for x in identifiers)
+
     def connect_to_bootstrap_peers(self):
         """
         Connect to bootstrap peers on startup.
         This allows new nodes to join the network automatically.
         """
-        my_url = f"http://localhost:{self.port}"
         connected = 0
         
         for peer_url in BOOTSTRAP_PEERS:
             # Skip self
-            if f":{self.port}" in peer_url:
+            if self._is_me(peer_url):
                 continue
             
             try:
@@ -380,8 +396,8 @@ class Node:
                     peer_list = data.get("peers", [])
                     for p in peer_list:
                         # Validate it's a proper URL before adding
-                        if isinstance(p, str) and p.startswith("http://") or p.startswith("https://"):
-                            if p not in current_peers and f"localhost:{self.port}" not in p:
+                        if isinstance(p, str) and (p.startswith("http://") or p.startswith("https://")):
+                            if p not in current_peers and not self._is_me(p):
                                 new_peers.add(p)
             except Exception:
                 pass
@@ -403,16 +419,13 @@ class Node:
         Connects to known peer and discovers other peers.
         """
         try:
-            my_url = f"http://localhost:{self.port}"
+            host_ip = os.getenv("HOST_IP", "localhost")
+            my_url = f"http://{host_ip}:{self.port}"
             
             # If no known peer, try default network nodes
             if not known_peer:
-                known_peers = [
-                    f"http://localhost:{COLLECTION_PORT}",
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "http://localhost:3002"
-                ]
+                # Use configured BOOTSTRAP_PEERS instead of hardcoded list
+                known_peers = BOOTSTRAP_PEERS
             else:
                 known_peers = [known_peer]
             
@@ -422,7 +435,7 @@ class Node:
             registered_with = set()
             
             for peer in known_peers:
-                if f"localhost:{self.port}" in peer:
+                if self._is_me(peer):
                     continue
                 if peer in registered_with:
                     continue
@@ -444,7 +457,7 @@ class Node:
                         # Get their peers too and register with them
                         data = response.json()
                         for p in data.get("peers", []):
-                            if f"localhost:{self.port}" not in p and p not in registered_with:
+                            if not self._is_me(p) and p not in registered_with:
                                 self.add_peer(p)
                                 # Register with discovered peer (one-time, no cascade)
                                 try:

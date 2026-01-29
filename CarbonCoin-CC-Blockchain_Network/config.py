@@ -39,6 +39,14 @@ def _get_env_list(key: str, default: list) -> list:
     return default
 
 
+def _get_env_list_str(key: str, default: list) -> list:
+    """Get list of strings from comma-separated environment variable."""
+    value = os.getenv(key)
+    if value:
+        return [x.strip() for x in value.split(',')]
+    return default
+
+
 # =============================================================================
 # COIN CONFIGURATION
 # =============================================================================
@@ -86,6 +94,10 @@ MINER_PORTS = _get_env_list("MINER_PORTS", [3000, 3001, 3002])
 # Collection node: 7000
 COLLECTION_PORT = _get_env_int("COLLECTION_PORT", 7000)
 
+# Centralized Collection Node URL (used by miners/gateway)
+# Defaults to localhost:7000, but can be overridden
+COLLECTION_NODE_URL = os.getenv("COLLECTION_NODE_URL", f"http://localhost:{COLLECTION_PORT}")
+
 # Gateway API: 8000 (centralized query service for frontend)
 GATEWAY_PORT = _get_env_int("GATEWAY_PORT", 8000)
 
@@ -98,12 +110,12 @@ USER_PORT_START = _get_env_int("USER_PORT_START", 5000)
 
 # These are the initial peers a new node will try to connect to
 # The node will then discover more peers from these
-BOOTSTRAP_PEERS = [
+BOOTSTRAP_PEERS = _get_env_list_str("BOOTSTRAP_PEERS", [
     "http://localhost:3000",
     "http://localhost:3001", 
     "http://localhost:3002",
     "http://localhost:7000",
-]
+])
 
 # =============================================================================
 # SPECIAL ADDRESSES
