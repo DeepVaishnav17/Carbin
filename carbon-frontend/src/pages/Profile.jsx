@@ -92,6 +92,7 @@ export default function Profile() {
             await api.post("/wallet/create");
             await fetchUser(); // Update global user state immediately
             setWalletCreated(true);
+            setTimeout(() => alert("Wallet Created! You are ready to join events."), 100);
         } catch (err) {
             alert("Failed to create wallet");
         } finally {
@@ -331,17 +332,36 @@ export default function Profile() {
 
                         {!walletCreated ? (
                             <div className="profile-action-card highlight">
-                                <h3 className="profile-action-title">Create Your Carbon Wallet</h3>
-                                <p className="profile-action-desc">
-                                    This wallet will store your carbon coins earned from participating in environmental events.
-                                </p>
-                                <button
-                                    className="profile-action-btn"
-                                    onClick={createWallet}
-                                    disabled={creating}
-                                >
-                                    {creating ? "Creating..." : "Get My Carbon Wallet"}
-                                </button>
+                                {creating ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '160px' }}>
+                                        <div style={{
+                                            border: '3px solid rgba(255,255,255,0.1)',
+                                            borderTop: '3px solid #00ff88',
+                                            borderRadius: '50%',
+                                            width: '32px',
+                                            height: '32px',
+                                            animation: 'spin 1s linear infinite',
+                                            marginBottom: '16px'
+                                        }}></div>
+                                        <h3 className="profile-action-title">Creating Wallet...</h3>
+                                        <p className="profile-action-desc">Please wait while we generate your secure address.</p>
+                                        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h3 className="profile-action-title">Create Your Carbon Wallet</h3>
+                                        <p className="profile-action-desc">
+                                            This wallet will store your carbon coins earned from participating in environmental events.
+                                        </p>
+                                        <button
+                                            className="profile-action-btn"
+                                            onClick={createWallet}
+                                            disabled={creating}
+                                        >
+                                            Get My Carbon Wallet
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <div className="profile-cards-grid">
