@@ -4,13 +4,12 @@ import sys
 import os
 import signal
 import platform
+import requests
 
 # Configuration
 NODES = [
     {"name": "Collection Node", "cmd": [sys.executable, "run_node.py", "7000"], "port": 7000},
     {"name": "Miner 1", "cmd": [sys.executable, "run_node.py", "3000"], "port": 3000},
-    {"name": "Miner 2", "cmd": [sys.executable, "run_node.py", "3001"], "port": 3001},
-    {"name": "Miner 3", "cmd": [sys.executable, "run_node.py", "3002"], "port": 3002},
 ]
 
 GATEWAY = {
@@ -35,6 +34,23 @@ def shutdown_network():
         else:
             p['process'].terminate()
     print("✅ Network stopped successfully.")
+
+def start_miner():
+    """Start the miner via POST request"""
+    miner_url = "http://13.234.117.179:3000/miner/start"
+    try:
+        print(f"📡 Sending POST request to start miner: {miner_url}")
+        response = requests.post(miner_url, timeout=10)
+        if response.status_code == 200:
+            print(f"✅ Miner started successfully! Response: {response.json()}")
+        else:
+            print(f"⚠️  Miner start returned status code {response.status_code}: {response.text}")
+    except requests.exceptions.ConnectionError:
+        print(f"⚠️  Could not connect to miner endpoint {miner_url}. Is the server running?")
+    except requests.exceptions.Timeout:
+        print(f"⚠️  Request to miner endpoint {miner_url} timed out.")
+    except Exception as e:
+        print(f"⚠️  Error starting miner: {str(e)}")
 
 def start_network():
     print("\n")
@@ -79,6 +95,11 @@ def start_network():
     print("   - Miners: Ports 3000, 3001, 3002")
     print("\n📝 Logs are visible in the opened terminal windows.")
     print("⌨️  Press Ctrl+C to stop all services.\n")
+
+    # Start the miner via API
+    print("⏳ Initializing miner startup...")
+    time.sleep(2)  # Give server a moment to be ready
+    start_miner()
 
     # Keep main script alive
     while True:
