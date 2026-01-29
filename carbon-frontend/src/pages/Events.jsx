@@ -94,6 +94,14 @@ export default function Events() {
       return;
     }
 
+    // Check if user has a wallet BEFORE optimistic update
+    if (!user.walletCreated && !user.walletAddress) {
+      if (confirm("You need a Carbon Wallet to join events and earn rewards! Go to Wallet now?")) {
+        navigate("/profile", { state: { tab: "wallet" } });
+      }
+      return;
+    }
+
     try {
       // Optimistic update
       setEvents(prevEvents => prevEvents.map(ev => {
@@ -107,16 +115,9 @@ export default function Events() {
       await fetchEvents();
       alert("Successfully joined event!");
     } catch (err) {
-      // Revert on failure (reload from server)
+      // Revert on failure
       fetchEvents();
-
-      if (err.response?.data?.message?.includes("Wallet")) {
-        if (confirm(err.response.data.message + ". Go to Wallet now?")) {
-          navigate("/profile", { state: { tab: "wallet" } });
-        }
-      } else {
-        alert(err.response?.data?.message || "Failed to join event");
-      }
+      alert(err.response?.data?.message || "Failed to join event");
     }
   };
 

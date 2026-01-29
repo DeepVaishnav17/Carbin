@@ -60,7 +60,7 @@ const CoinIcon = () => (
 export default function Profile() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, setUser } = useContext(AuthContext);
+    const { user, setUser, fetchUser } = useContext(AuthContext);
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || "overview");
     const [walletCreated, setWalletCreated] = useState(false);
@@ -72,21 +72,25 @@ export default function Profile() {
     const [loadingTx, setLoadingTx] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const loadUserData = async () => {
             try {
+                // If context user is not fully loaded or we want fresh data
                 const res = await api.get("/auth/me");
                 setWalletCreated(res.data.walletCreated);
-            } catch (err) { }
+            } catch {
+                // ignore
+            }
             setLoading(false);
         };
 
-        fetchUser();
+        loadUserData();
     }, []);
 
     const createWallet = async () => {
         try {
             setCreating(true);
             await api.post("/wallet/create");
+            await fetchUser(); // Update global user state immediately
             setWalletCreated(true);
         } catch (err) {
             alert("Failed to create wallet");
