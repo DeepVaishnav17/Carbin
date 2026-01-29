@@ -49,6 +49,9 @@ app.use("/api/events", eventRoutes);
 // const walletRoutes = require("./src/routes/walletRoutes");
 // app.use("/api/wallet", walletRoutes);
 
+const mlRoutes = require("./src/routes/mlRoutes");
+app.use("/api/ml", mlRoutes);
+
 
 app.use("/api/wallet", require("./src/routes/wallet"));
 

@@ -33,15 +33,13 @@ const Predict = () => {
         setForecastData(null);
 
         try {
-            // const response = await axios.get(`${import.meta.env.VITE_ML_API_URL || "http://3.110.179.98:5000"}/predict`, {
-            //     params: {
-            //         state: state.trim(),
-            //         area: area.trim(),
-            //     },
-            // });
-
-            const response = await axios.get("/api/predict", { params: { state, area } })
-
+            // Use backend proxy instead of direct ML server call
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/ml/predict`, {
+                params: {
+                    state: state.trim(),
+                    area: area.trim(),
+                },
+            });
 
             if (response.data.status === 'success') {
                 // Add date field to forecast data for components
@@ -62,10 +60,11 @@ const Predict = () => {
                 setError(response.data.message || 'Failed to fetch forecast');
             }
         } catch (err) {
+            console.error("Error fetching forecast:", err);
             if (err.response?.data?.message) {
                 setError(err.response.data.message);
             } else if (err.message === 'Network Error') {
-                setError(`Unable to connect to the server. Make sure the Flask backend is running on ${import.meta.env.VITE_ML_API_URL || "http://localhost:5000"}`);
+                setError(`Unable to connect to the server. Make sure the Backend is running on ${import.meta.env.VITE_API_URL}`);
             } else {
                 setError('Error fetching forecast. Please try again.');
             }
