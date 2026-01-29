@@ -89,10 +89,21 @@ export default function Events() {
 
   const handleJoin = async (eventId) => {
     try {
+      // Optimistic update
+      setEvents(prevEvents => prevEvents.map(ev => {
+        if (ev._id === eventId) {
+          return { ...ev, participants: [...ev.participants, user._id] };
+        }
+        return ev;
+      }));
+
       await api.post(`/events/join/${eventId}`);
-      fetchEvents();
+      await fetchEvents();
       alert("Successfully joined event!");
     } catch (err) {
+      // Revert on failure (reload from server)
+      fetchEvents();
+
       if (err.response?.data?.message?.includes("Wallet")) {
         if (confirm(err.response.data.message + ". Go to Wallet now?")) {
           navigate("/profile", { state: { tab: "wallet" } });
