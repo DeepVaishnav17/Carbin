@@ -34,7 +34,11 @@ const Predict = () => {
 
         try {
             // Use backend proxy instead of direct ML server call
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/ml/predict`, {
+            // Fallback to production backend if env var is missing
+            const backendUrl = import.meta.env.VITE_API_URL || "https://carbin-1.onrender.com/api";
+            console.log("Fetching forecast from:", `${backendUrl}/ml/predict`);
+
+            const response = await axios.get(`${backendUrl}/ml/predict`, {
                 params: {
                     state: state.trim(),
                     area: area.trim(),
