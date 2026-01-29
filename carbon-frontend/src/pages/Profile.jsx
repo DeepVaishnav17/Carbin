@@ -91,6 +91,8 @@ export default function Profile() {
             setCreating(true);
             await api.post("/wallet/create");
             await fetchUser(); // Update global user state immediately
+            await getWalletAddress(); // Fetch explicit address
+            await getBalance(); // Fetch initial balance
             setWalletCreated(true);
             setTimeout(() => alert("Wallet Created! You are ready to join events."), 100);
         } catch (err) {
@@ -151,12 +153,15 @@ export default function Profile() {
     useEffect(() => {
         // Debug logs
         console.log("Profile Effect - User:", user);
-        console.log("Profile Effect - Wallet Address State:", walletAddress);
+
+        // Sync local wallet address from global user state if available
+        if (user?.walletAddress && user.walletAddress !== walletAddress) {
+            setWalletAddress(user.walletAddress);
+        }
 
         if (activeTab === "wallet" && walletCreated) {
             if (balance === null) getBalance();
-            if (!walletAddress) {
-                console.log("Fetching wallet address explicitly...");
+            if (!walletAddress && !user?.walletAddress) {
                 getWalletAddress();
             }
         }
