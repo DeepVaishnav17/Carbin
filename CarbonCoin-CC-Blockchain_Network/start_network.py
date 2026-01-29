@@ -7,15 +7,15 @@ import platform
 
 # Configuration
 NODES = [
-    {"name": "Collection Node", "cmd": ["python", "run_node.py", "7000"], "port": 7000},
-    {"name": "Miner 1", "cmd": ["python", "run_node.py", "3000"], "port": 3000},
-    {"name": "Miner 2", "cmd": ["python", "run_node.py", "3001"], "port": 3001},
-    {"name": "Miner 3", "cmd": ["python", "run_node.py", "3002"], "port": 3002},
+    {"name": "Collection Node", "cmd": [sys.executable, "run_node.py", "7000"], "port": 7000},
+    {"name": "Miner 1", "cmd": [sys.executable, "run_node.py", "3000"], "port": 3000},
+    {"name": "Miner 2", "cmd": [sys.executable, "run_node.py", "3001"], "port": 3001},
+    {"name": "Miner 3", "cmd": [sys.executable, "run_node.py", "3002"], "port": 3002},
 ]
 
 GATEWAY = {
     "name": "Gateway Service",
-    "cmd": ["python", "-c", "from gateway.query_service import run_gateway; run_gateway(8000)"],
+    "cmd": [sys.executable, "-c", "from gateway.query_service import run_gateway; run_gateway(8000)"],
     "port": 8000
 }
 
