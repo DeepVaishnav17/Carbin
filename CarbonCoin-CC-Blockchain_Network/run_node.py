@@ -60,25 +60,27 @@ def main() -> int:
     print(f"╚══════════════════════════════════════════════════════════╝")
     print(f"")
     
+    host_display = os.getenv("HOST_DISPLAY", "localhost")
+    
     if node_type == "miner":
         print("📍 Miner endpoints:")
-        print(f"   POST http://localhost:{port}/miner/start  - Start mining + auto-transfer")
-        print(f"   POST http://localhost:{port}/miner/stop   - Stop all services")
-        print(f"   GET  http://localhost:{port}/balance      - Check balance")
+        print(f"   POST http://{host_display}:{port}/miner/start  - Start mining + auto-transfer")
+        print(f"   POST http://{host_display}:{port}/miner/stop   - Stop all services")
+        print(f"   GET  http://{host_display}:{port}/balance      - Check balance")
     elif node_type == "collection":
         print("📍 Collection node endpoints:")
-        print(f"   POST http://localhost:{port}/reward       - Reward a user")
-        print(f"   GET  http://localhost:{port}/balance      - Check balance")
+        print(f"   POST http://{host_display}:{port}/reward       - Reward a user")
+        print(f"   GET  http://{host_display}:{port}/balance      - Check balance")
     else:
         print("📍 User node endpoints:")
-        print(f"   GET  http://localhost:{port}/balance      - Check balance")
-        print(f"   POST http://localhost:{port}/transfer     - Transfer coins")
+        print(f"   GET  http://{host_display}:{port}/balance      - Check balance")
+        print(f"   POST http://{host_display}:{port}/transfer     - Transfer coins")
     
     print("")
     print(f"📊 Common endpoints:")
-    print(f"   GET  http://localhost:{port}/             - Node info")
-    print(f"   GET  http://localhost:{port}/chain        - View blockchain")
-    print(f"   GET  http://localhost:{port}/stats        - Network stats")
+    print(f"   GET  http://{host_display}:{port}/             - Node info")
+    print(f"   GET  http://{host_display}:{port}/chain        - View blockchain")
+    print(f"   GET  http://{host_display}:{port}/stats        - Network stats")
     print("")
 
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)

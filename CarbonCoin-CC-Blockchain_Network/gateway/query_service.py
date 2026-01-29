@@ -38,8 +38,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Configuration
-GATEWAY_PORT = 8000
-COLLECTION_NODE_URL = "http://localhost:7000"
+GATEWAY_PORT = int(os.getenv("GATEWAY_PORT", 8000))
+COLLECTION_NODE_URL = os.getenv("COLLECTION_NODE_URL", "http://localhost:7000")
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 SESSIONS_FILE = os.path.join(DATA_DIR, "active_sessions.json")
 WALLETS_FILE = os.path.join(DATA_DIR, "wallets.json")
