@@ -172,22 +172,22 @@ exports.joinEvent = async (req, res) => {
     }
 
     // ✅ QR URL hosted by your backend
-    const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
+    // const qrImageUrl = `${process.env.BACKEND_URL}/api/events/qr/${eventId}/${userId}`;
 
-    await sendEmail(
-      user.email,
-      `QR Code for ${event.title}`,
-      `
-    <h2>You successfully joined "${event.title}"</h2>
-    <p>Show this QR code to the organizer:</p>
-    <img src="${qrImageUrl}" style="width:250px;height:250px;" />
-    <p><b>Location:</b> ${event.location}</p>
-    <p><b>Date:</b> ${new Date(event.date).toDateString()}</p>
-  `
-    );
+    // await sendEmail(
+    //   user.email,
+    //   `QR Code for ${event.title}`,
+    //   `
+    //     <h2>You successfully joined "${event.title}"</h2>
+    //     <p>Show this QR code to the organizer:</p>
+    //     <img src="${qrImageUrl}" style="width:250px;height:250px;" />
+    //     <p><b>Location:</b> ${event.location}</p>
+    //     <p><b>Date:</b> ${new Date(event.date).toDateString()}</p>
+    //   `
+    // );
+    console.log(`User ${user.email} joined event ${event.title}. Email notification skipped (handled in frontend).`);
 
-
-    res.json({ message: "Joined event. QR sent to your email!" });
+    res.json({ message: "Joined event successfully!" });
 
   } catch (err) {
     console.log(err);
