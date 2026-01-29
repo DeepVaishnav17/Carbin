@@ -57,7 +57,7 @@ def start_network():
     print("╔══════════════════════════════════════════════════════════╗")
     print("║      CarbonCoin (CC) Blockchain Network Launcher         ║")
     print("╠══════════════════════════════════════════════════════════╣")
-    print("║  1. Starting 4 Blockchain Nodes (Collection + Miners)    ║")
+    print("║  1. Starting 2 Blockchain Nodes (Collection + Miner)     ║")
     print("║  2. Starting Gateway Query Service                       ║")
     print("║  3. Press Ctrl+C to stop the network                     ║")
     print("╚══════════════════════════════════════════════════════════╝")
