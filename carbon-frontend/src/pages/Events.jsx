@@ -88,6 +88,12 @@ export default function Events() {
   /* ================= ACTIONS ================= */
 
   const handleJoin = async (eventId) => {
+    if (!user) {
+      alert("Please login to join events");
+      navigate("/login");
+      return;
+    }
+
     try {
       // Optimistic update
       setEvents(prevEvents => prevEvents.map(ev => {
